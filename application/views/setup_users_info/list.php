@@ -18,7 +18,20 @@ if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
         'class'=>'button_jqx_action',
         'data-action-link'=>site_url($CI->controller_url.'/index/edit')
     );
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>'Change Password',
+        'class'=>'button_jqx_action',
+        'data-action-link'=>site_url($CI->controller_url.'/index/edit_password')
+    );
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>'Change Status',
+        'class'=>'button_jqx_action',
+        'data-action-link'=>site_url($CI->controller_url.'/index/edit_status')
+    );
 }
+
 $action_buttons[]=array(
     'type'=>'button',
     'label'=>$CI->lang->line("ACTION_DETAILS"),
