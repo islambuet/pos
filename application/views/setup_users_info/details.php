@@ -134,7 +134,31 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <label class="control-label"><?php echo $user_info['status'];?></label>
         </div>
     </div>
+    <div style="" class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Assigned Outlet(s)</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <?php
+            if(sizeof($assigned_outlets)>0)
+            {
+                foreach($assigned_outlets as $outlet)
+                {
+                ?>
+                    <label class="control-label"><?php echo $outlet['text']; ?></label><br>
+                <?php
+                }
+            }
+            else
+            {
+                ?>
+                <label class="control-label">No Outlet Assigned Yet.</label>
+                <?php
+            }
+            ?>
 
+        </div>
+    </div>
 </div>
 
 <div class="clearfix"></div>

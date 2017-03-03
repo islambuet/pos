@@ -44,6 +44,13 @@ class Profile_info extends Root_Controller
             $data['user_info']=$this->db->get()->row_array();
             $data['title']=$data['user_info']['name'];
 
+            $this->db->from($this->config->item('table_pos_setup_user_outlet').' uo');
+            $this->db->select('CONCAT(cus.customer_code," - ",cus.name) text');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id = uo.customer_id','INNER');
+            $this->db->where('uo.revision',1);
+            $this->db->where('uo.user_id',$user_id);
+            $data['assigned_outlets']=$this->db->get()->result_array();
+
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/details",$data,true));
             if($this->message)

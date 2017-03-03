@@ -26,6 +26,15 @@ if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
     );
     $action_buttons[]=array(
         'type'=>'button',
+        'label'=>'Assign outlet',
+        'class'=>'button_jqx_action',
+        'data-action-link'=>site_url($CI->controller_url.'/index/edit_outlet')
+    );
+}
+if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
+{
+    $action_buttons[]=array(
+        'type'=>'button',
         'label'=>'Change Status',
         'class'=>'button_jqx_action',
         'data-action-link'=>site_url($CI->controller_url.'/index/edit_status')
@@ -80,6 +89,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="user_name"><?php echo $CI->lang->line('LABEL_USERNAME'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="name"><?php echo $CI->lang->line('LABEL_NAME'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="group_name"><?php echo $CI->lang->line('LABEL_USER_GROUP'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="total_outlet">#Outlet</label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="designation_name"><?php echo $CI->lang->line('LABEL_DESIGNATION_NAME'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="mobile_no"><?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="blood_group"><?php echo $CI->lang->line('LABEL_BLOOD_GROUP'); ?></label>
@@ -109,6 +119,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'user_name', type: 'string' },
                 { name: 'name', type: 'string' },
                 { name: 'group_name', type: 'string' },
+                { name: 'total_outlet', type: 'string' },
                 { name: 'designation_name', type: 'string' },
                 { name: 'mobile_no', type: 'string' },
                 { name: 'blood_group', type: 'string' },
@@ -140,6 +151,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_USERNAME'); ?>', dataField: 'user_name',width:'150'},
                     { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'300'},
                     { text: '<?php echo $CI->lang->line('LABEL_USER_GROUP'); ?>', dataField: 'group_name',filtertype: 'list'},
+                    { text: '#Outlet', dataField: 'total_outlet',width:'50',filtertype: 'list'},
                     { text: '<?php echo $CI->lang->line('LABEL_DESIGNATION_NAME'); ?>', dataField: 'designation_name',width:'200'},
                     { text: '<?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?>', dataField: 'mobile_no'},
                     { text: '<?php echo $CI->lang->line('LABEL_BLOOD_GROUP'); ?>', dataField: 'blood_group',filtertype: 'list'},

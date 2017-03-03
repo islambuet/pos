@@ -99,18 +99,27 @@ $CI=& get_instance();
     </div>
     <div style="" class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ORDER');?></label>
+            <label class="control-label pull-right">Assigned Outlet(s)</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label class="control-label"><?php echo $user_info['ordering'];?></label>
-        </div>
-    </div>
-    <div style="" class="row show-grid">
-        <div class="col-xs-4">
-            <label class="control-label pull-right"><?php echo $CI->lang->line('STATUS');?></label>
-        </div>
-        <div class="col-sm-4 col-xs-8">
-            <label class="control-label"><?php echo $user_info['status'];?></label>
+            <?php
+            if(sizeof($assigned_outlets)>0)
+            {
+                foreach($assigned_outlets as $outlet)
+                {
+                    ?>
+                    <label class="control-label"><?php echo $outlet['text']; ?></label><br>
+                <?php
+                }
+            }
+            else
+            {
+                ?>
+                <label class="control-label">No Outlet Assigned Yet.</label>
+            <?php
+            }
+            ?>
+
         </div>
     </div>
 

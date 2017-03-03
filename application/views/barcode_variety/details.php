@@ -90,9 +90,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_OUTLET_NAME');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="outlet_id" name="item[outlet_id]" class="form-control">
-                    <option value="Dashuria-Ishwardi">Dashuria-Ishwardi</option>
-                    <option value="Dhaka Aftabnagar">Dhaka Aftabnagar</option>
+                <select name="item[outlet]" class="form-control">
+                    <?php
+                    foreach($outlets as $row)
+                    {?>
+                        <option value="<?php echo $row['name_short']?>"><?php echo $row['text'];?></option>
+                    <?php
+                    }
+                    ?>
                 </select>
             </div>
         </div>

@@ -36,6 +36,10 @@ class Setup_users_info extends Root_Controller
         {
             $this->system_edit_password($id);
         }
+        elseif($action=="edit_outlet")
+        {
+            $this->system_edit_outlet($id);
+        }
         elseif($action=="edit_status")
         {
             $this->system_edit_status($id);
@@ -51,6 +55,10 @@ class Setup_users_info extends Root_Controller
         elseif($action=="save_password")
         {
             $this->system_save_password();
+        }
+        elseif($action=="save_outlet")
+        {
+            $this->system_save_outlet();
         }
         elseif($action=="save_status")
         {
@@ -93,15 +101,20 @@ class Setup_users_info extends Root_Controller
         $this->db->select('user_info.name,user_info.ordering,user_info.blood_group,user_info.mobile_no');
         $this->db->select('ug.name group_name');
         $this->db->select('designation.name designation_name');
+        $this->db->select('count(customer_id) total_outlet',true);
         $this->db->join($this->config->item('table_pos_setup_user_info').' user_info','user.id = user_info.user_id','INNER');
-        $this->db->join($this->config->item('table_system_user_group').' ug','ug.id = user_info.user_group','LEFT');
-        $this->db->join($this->config->item('table_pos_setup_designation').' designation','designation.id = user_info.designation','LEFT');
+        $this->db->join($this->config->item('table_system_user_group').' ug','ug.id = user_info.user_group','INNER');
+        $this->db->join($this->config->item('table_pos_setup_designation').' designation','designation.id = user_info.designation','INNER');
+
+        $this->db->join($this->config->item('table_pos_setup_user_outlet').' uo','uo.user_id = user.id and uo.revision =1','LEFT');
         $this->db->where('user_info.revision',1);
-        $this->db->order_by('user_info.ordering','ASC');
+
         if($user->user_group!=1)
         {
             $this->db->where('user_info.user_group !=',1);
         }
+        $this->db->order_by('user_info.ordering ASC');
+        $this->db->group_by('user.id');
         $items=$this->db->get()->result_array();
         $this->json_return($items);
 
@@ -231,9 +244,46 @@ class Setup_users_info extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    private function system_edit_status($id)
+    private function system_edit_outlet($id)
     {
         if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+        {
+            if(($this->input->post('id')))
+            {
+                $user_id=$this->input->post('id');
+            }
+            else
+            {
+                $user_id=$id;
+            }
+            $data['user_info']=Query_helper::get_info($this->config->item('table_pos_setup_user_info'),'*',array('user_id ='.$user_id,'revision =1'),1);
+            $data['title']="Assign Outlet For(".$data['user_info']['name'].')';
+            $ajax['status']=true;
+            $data['outlets']=Query_helper::get_info($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers'),array('id value','CONCAT(customer_code," - ",name) text'),array('status ="'.$this->config->item('system_status_active').'"','type ="Outlet"'));
+            $results=Query_helper::get_info($this->config->item('table_pos_setup_user_outlet'),array('customer_id'),array('user_id ='.$user_id,'revision =1'));
+            $data['assigned_outlets']=array();
+            foreach($results as $result)
+            {
+                $data['assigned_outlets'][]=$result['customer_id'];
+            }
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/edit_outlet",$data,true));
+            if($this->message)
+            {
+                $ajax['system_message']=$this->message;
+            }
+            $ajax['system_page_url']=site_url($this->controller_url.'/index/edit_outlet/'.$user_id);
+            $this->json_return($ajax);
+        }
+        else
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+            $this->json_return($ajax);
+        }
+    }
+    private function system_edit_status($id)
+    {
+        if(isset($this->permissions['action3']) && ($this->permissions['action3']==1))
         {
             if(($this->input->post('id')))
             {
@@ -287,6 +337,13 @@ class Setup_users_info extends Root_Controller
 
             $data['user_info']=$this->db->get()->row_array();
             $data['title']="Details of User (".$data['user_info']['name'].')';
+
+            $this->db->from($this->config->item('table_pos_setup_user_outlet').' uo');
+            $this->db->select('CONCAT(cus.customer_code," - ",cus.name) text');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id = uo.customer_id','INNER');
+            $this->db->where('uo.revision',1);
+            $this->db->where('uo.user_id',$user_id);
+            $data['assigned_outlets']=$this->db->get()->result_array();
 
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/details",$data,true));
@@ -436,11 +493,68 @@ class Setup_users_info extends Root_Controller
             }
         }
     }
+    private function system_save_outlet()
+    {
+        $id = $this->input->post("id");
+        $user = User_helper::get_user();
+        $time=time();
+        if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)))
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+            $this->json_return($ajax);
+            die();
+        }
+        {
+
+            $this->db->trans_start();  //DB Transaction Handle START
+            $this->db->where('user_id',$id);
+            $this->db->where('revision >',1);
+            $this->db->set('revision', 'revision+1', FALSE);
+            $this->db->update($this->config->item('table_pos_setup_user_outlet'));
+
+            $this->db->where('user_id',$id);
+            $this->db->where('revision',1);
+            $this->db->set('revision',2);
+            $this->db->set('user_updated',$user->user_id);
+            $this->db->set('date_updated',$time);
+            $this->db->update($this->config->item('table_pos_setup_user_outlet'));
+
+            $items=$this->input->post('items');
+            if(is_array($items))
+            {
+                foreach($items as $customer_id)
+                {
+                    $data=array();
+                    $data['user_id']=$id;
+                    $data['customer_id']=$customer_id;
+                    $data['user_created'] = $user->user_id;
+                    $data['date_created'] = $time;
+                    $data['revision'] = 1;
+                    Query_helper::add($this->config->item('table_pos_setup_user_outlet'),$data);
+                }
+            }
+
+            $this->db->trans_complete();   //DB Transaction Handle END
+            if ($this->db->trans_status() === TRUE)
+            {
+
+                $this->message=$this->lang->line("MSG_SAVED_SUCCESS");
+                $this->system_list();
+            }
+            else
+            {
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("MSG_SAVED_FAIL");
+                $this->json_return($ajax);
+            }
+        }
+    }
     private function system_save_status()
     {
         $id = $this->input->post("id");
         $user = User_helper::get_user();
-        if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)))
+        if(!(isset($this->permissions['action3']) && ($this->permissions['action3']==1)))
         {
             $ajax['status']=false;
             $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");

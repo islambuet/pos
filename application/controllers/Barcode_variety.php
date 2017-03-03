@@ -112,6 +112,7 @@ class Barcode_variety extends Root_Controller
             $this->db->where('vp.id',$item_id);
             $data['item']=$this->db->get()->row_array();
             $data['item']['line1']='Malik Seeds';
+            $data['outlets']=Query_helper::get_info($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers'),array('name_short','CONCAT(customer_code," - ",name) text'),array('status ="'.$this->config->item('system_status_active').'"','type ="Outlet"'));
             $data['title']='Variety Barcode Generate';
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/details",$data,true));
@@ -156,7 +157,7 @@ class Barcode_variety extends Root_Controller
             $this->db->where('vp.id',$item_id);
             $data['item']=$this->db->get()->row_array();
             $data['item']['line1']=$item['line1'];
-            $data['item']['outlet_name']=$item['outlet_id'];
+            $data['item']['outlet']=$item['outlet'];
             $data['item']['bar_code']=str_pad($data['item']['crop_id'],2,0,STR_PAD_LEFT).str_pad($data['item']['variety_id'],4,0,STR_PAD_LEFT).str_pad($data['item']['pack_id'],2,0,STR_PAD_LEFT);
 
             $ajax['status']=true;
@@ -169,9 +170,6 @@ class Barcode_variety extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('item[line1]','Line 1','required');
-        $this->form_validation->set_rules('item[outlet_id]',$this->lang->line('LABEL_OUTLET_NAME'),'required');
-
-
         if($this->form_validation->run() == FALSE)
         {
             $this->message=validation_errors();
