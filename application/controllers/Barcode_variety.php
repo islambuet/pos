@@ -80,7 +80,7 @@ class Barcode_variety extends Root_Controller
         $items=$this->db->get()->result_array();
         foreach($items as &$item)
         {
-            $item['bar_code']=str_pad($item['crop_id'],2,0,STR_PAD_LEFT).str_pad($item['variety_id'],4,0,STR_PAD_LEFT).str_pad($item['pack_id'],2,0,STR_PAD_LEFT);
+            $item['bar_code']=System_helper::get_variety_barcode($item['crop_id'],$item['variety_id'],$item['pack_id']);
         }
         $this->json_return($items);
 
@@ -158,8 +158,7 @@ class Barcode_variety extends Root_Controller
             $data['item']=$this->db->get()->row_array();
             $data['item']['line1']=$item['line1'];
             $data['item']['outlet']=$item['outlet'];
-            $data['item']['bar_code']=str_pad($data['item']['crop_id'],2,0,STR_PAD_LEFT).str_pad($data['item']['variety_id'],4,0,STR_PAD_LEFT).str_pad($data['item']['pack_id'],2,0,STR_PAD_LEFT);
-
+            $data['item']['bar_code']=System_helper::get_variety_barcode($data['item']['crop_id'],$data['item']['variety_id'],$data['item']['pack_id']);
             $ajax['status']=true;
             $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/barcode",$data,true));
 

@@ -79,5 +79,8 @@ class System_helper
         $data['date_created_string']=System_helper::display_date($time);
         $CI->db->insert($CI->config->item('table_system_history_hack'), $data);
     }
-
+    public static function get_variety_barcode($crop_id,$variety_id,$pack_id)
+    {
+        return str_pad($crop_id,2,0,STR_PAD_LEFT).str_pad($variety_id,4,0,STR_PAD_LEFT).str_pad($pack_id,2,0,STR_PAD_LEFT);
+    }
 }

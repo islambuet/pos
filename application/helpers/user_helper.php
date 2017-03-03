@@ -163,4 +163,28 @@ class User_helper
         $result=$CI->db->get()->row_array();
         return $result;
     }
+    public static function get_assigned_outlets()
+    {
+        $CI = & get_instance();
+        $user=User_helper::get_user();
+        $CI->db->from($CI->config->item('table_pos_setup_user_outlet').' uo');
+        $CI->db->select('cus.*');
+        $CI->db->select('d.id district_id,d.name district_name');
+        $CI->db->select('t.id territory_id,t.name territory_name');
+        $CI->db->select('zone.id zone_id,zone.name zone_name');
+        $CI->db->select('division.id division_id,division.name division_name');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_csetup_customers').' cus','cus.id = uo.customer_id','INNER');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_location_districts').' d','d.id = cus.district_id','INNER');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_location_territories').' t','t.id = d.territory_id','INNER');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_location_zones').' zone','zone.id = t.zone_id','INNER');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_location_divisions').' division','division.id = zone.division_id','INNER');
+        $CI->db->where('uo.revision',1);
+        $CI->db->where('uo.user_id',$user->user_id);
+        $CI->db->order_by('division.ordering ASC');
+        $CI->db->order_by('zone.ordering ASC');
+        $CI->db->order_by('t.ordering ASC');
+        $CI->db->order_by('d.ordering ASC');
+        $CI->db->order_by('cus.ordering ASC');
+        return $CI->db->get()->result_array();
+    }
 }

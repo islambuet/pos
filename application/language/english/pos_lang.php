@@ -5,6 +5,7 @@ $lang['MSG_USERNAME_PASSWORD_INVALID'] = 'Username and Password did not match or
 $lang['MSG_LOGIN_SUCCESS'] = 'Successfully Logged In';
 $lang['MSG_LOGOUT_SUCCESS'] = 'Successfully Logged out';
 $lang['MSG_SITE_OFFLINE'] = 'Site is Currently Offline.Please contact with admin(09666775544.Ext.901).';
+$lang['MSG_OUTLET_NOT_ASSIGNED'] = 'No Outlet Assigned.<br>Please contact with admin(09666775544.Ext.901).';
 
 //Action buttons
 $lang['ACTION_DASHBOARD'] = 'Dashboard';
@@ -108,3 +109,6 @@ $lang['LABEL_PRICE'] = 'Price';
 $lang['LABEL_PRICE_TRADE'] = 'Trade Price';
 $lang['LABEL_PRICE_NET'] = 'Net Price';
 $lang['LABEL_OUTLET_NAME'] = 'Outlet';
+$lang['LABEL_DISCOUNT'] = 'Discount';
+$lang['LABEL_DISCOUNT_COUPON'] = 'Coupon Discount';
+$lang['LABEL_DISCOUNT_NON_COUPON'] = 'Non Coupon Discount';
