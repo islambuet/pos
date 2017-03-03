@@ -83,4 +83,8 @@ class System_helper
     {
         return str_pad($crop_id,2,0,STR_PAD_LEFT).str_pad($variety_id,4,0,STR_PAD_LEFT).str_pad($pack_id,2,0,STR_PAD_LEFT);
     }
+    public static function get_farmer_barcode($id)
+    {
+        return str_pad($id,10,0,STR_PAD_LEFT);
+    }
 }

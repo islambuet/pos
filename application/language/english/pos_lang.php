@@ -112,3 +112,4 @@ $lang['LABEL_OUTLET_NAME'] = 'Outlet';
 $lang['LABEL_DISCOUNT'] = 'Discount';
 $lang['LABEL_DISCOUNT_COUPON'] = 'Coupon Discount';
 $lang['LABEL_DISCOUNT_NON_COUPON'] = 'Non Coupon Discount';
+$lang['LABEL_BARCODE'] = 'Barcode';
