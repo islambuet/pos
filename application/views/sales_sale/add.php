@@ -1,0 +1,269 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+$CI=& get_instance();
+$action_buttons=array();
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_BACK"),
+    'href'=>site_url($CI->controller_url)
+);
+$action_buttons[]=array(
+    'type'=>'button',
+    'label'=>'New Customer',
+    'id'=>'button_action_farmer_new'
+);
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_CLEAR"),
+    'href'=>site_url($CI->controller_url.'/index/add')
+);
+$CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
+?>
+<div class="row widget">
+    <div class="widget-header">
+        <div class="title">
+            <?php echo $title; ?>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div id="container_sale">
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_OUTLET_NAME');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <?php
+                if(sizeof($CI->user_outlets)==1)
+                {
+                    ?>
+                    <input type="hidden" id="customer_id" value="<?php echo $CI->user_outlets[0]['id'] ?>" />
+                    <label class="control-label"><?php echo $CI->user_outlets[0]['name'] ?></label>
+                    <?php
+                }
+                else
+                {
+                    ?>
+                    <select id="customer_id" class="form-control">
+                        <?php
+                        foreach($CI->user_outlets as $row)
+                        {?>
+                            <option value="<?php echo $row['id']?>"><?php echo $row['name'];?></option>
+                        <?php
+                        }
+                        ?>
+                    </select>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">
+                    <?php echo $this->lang->line('LABEL_MOBILE_NO');?> |<br>
+                    <?php echo 'Customer '.$this->lang->line('LABEL_BARCODE');?> |<br>
+                    <?php echo 'Old '.$this->lang->line('LABEL_INVOICE_NO');?>
+                </label>
+            </div>
+            <div class="col-sm-4 col-xs-4">
+                <input type="text" id="code" class="form-control" value=""/>
+            </div>
+            <div class="col-sm-4 col-xs-4">
+                <div class="action_button">
+                    <button id="button_action_farmer_search" type="button" class="btn"><?php echo $this->lang->line('LABEL_SEARCH');?></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="container_new_customer" style="display: none;">
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_MOBILE_NO');?><span style="color:#FF0000">*</span></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <input type="text" id="mobile_no" class="form-control" value=""/>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_NAME');?><span style="color:#FF0000">*</span></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <input type="text" id="name_farmer" class="form-control" value=""/>
+            </div>
+        </div>
+
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_NID');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <input type="text" id="nid" class="form-control" value=""/>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ADDRESS');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <textarea class="form-control" id="farmer_address"></textarea>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <div class="action_button">
+                    <button id="button_action_farmer_save" type="button" class="btn"><?php echo $this->lang->line('ACTION_SAVE');?></button>
+                </div>
+                <div class="action_button">
+                    <button id="button_action_farmer_cancel" type="button" class="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+<?php
+     if(sizeof($varieties_info)>0)
+     {
+        ?>
+var varieties_info=JSON.parse('<?php echo JSON_encode($varieties_info);?>');
+<?php
+}
+else
+{
+ ?>
+var varieties_info=[];
+<?php
+}
+?>
+    function search_farmer()
+    {
+        var customer_id=$('#customer_id').val();
+        var code=$('#code').val();
+        if((customer_id>0)&& (code.length>0))
+        {
+            $.ajax({
+                url:'<?php echo site_url($CI->controller_url.'/index/search_farmer') ?>',
+                type: 'POST',
+                datatype: "JSON",
+                data:{customer_id:customer_id,code:code},
+                success: function (data, status)
+                {
+
+                },
+                error: function (xhr, desc, err)
+                {
+                    console.log("error");
+
+                }
+            });
+        }
+    }
+    function add_variety()
+    {
+        var variety_barcode=$('#variety_barcode').val();
+        if(varieties_info[variety_barcode]===undefined)
+        {
+            animate_message("invalid code");
+        }
+        else
+        {
+            var content_id='#system_content_add_more table tbody';
+            $(content_id+' .crop_name').html(varieties_info[variety_barcode]['crop_name']);
+            $(content_id+' .type_name').html(varieties_info[variety_barcode]['type_name']);
+            $(content_id+' .variety_name').html(varieties_info[variety_barcode]['variety_name']);
+            $(content_id+' .pack_size').html(varieties_info[variety_barcode]['pack_size']);
+            $(content_id+' .pack_size_price').html(varieties_info[variety_barcode]['price']);
+            var html=$(content_id).html();
+            $("#order_items_container tbody").append(html);
+            console.log(varieties_info[variety_barcode]);
+        }
+    }
+    jQuery(document).ready(function()
+    {
+        $(document).off("click", "#button_action_farmer_search");
+        $(document).on("click","#button_action_farmer_search",function()
+        {
+            search_farmer();
+
+        });
+        $(document).off("keypress", "#code");
+        $(document).on("keypress","#code",function(event)
+        {
+            if(event.which == 13)
+            {
+                search_farmer();
+            }
+
+
+        });
+        $(document).off("click", "#button_action_farmer_new");
+        $(document).on("click","#button_action_farmer_new",function()
+        {
+            $('#container_new_customer').show();
+
+        });
+        $(document).off("click", "#button_action_farmer_cancel");
+        $(document).on("click","#button_action_farmer_cancel",function()
+        {
+            $('#container_new_customer').hide();
+
+        });
+        $(document).off("click", "#button_action_farmer_save");
+        $(document).on("click","#button_action_farmer_save",function()
+        {
+            var sure = confirm('Are you Sure to Create this Customer?');
+            if(!sure)
+            {
+                return;
+            }
+            var customer_id=$('#customer_id').val();
+            var mobile_no=$('#mobile_no').val();
+            var name=$('#name_farmer').val();
+            var nid=$('#nid').val();
+            var address=$('#farmer_address').val();
+            $.ajax({
+                url:'<?php echo site_url($CI->controller_url.'/index/save_farmer') ?>',
+                type: 'POST',
+                datatype: "JSON",
+                data:{customer_id:customer_id,mobile_no:mobile_no,name:name,address:address,nid:nid},
+                success: function (data, status)
+                {
+
+                },
+                error: function (xhr, desc, err)
+                {
+                    console.log("error");
+
+                }
+            });
+        });
+        $(document).off("keypress", "#variety_barcode");
+        $(document).on("keypress","#variety_barcode",function(event)
+        {
+            if(event.which == 13)
+            {
+                add_variety();
+                return false;
+            }
+
+        });
+        $(document).off("click", "#button_action_variety_add");
+        $(document).on("click", "#button_action_variety_add", function(event)
+        {
+            add_variety();
+        });
+
+
+         // Delete more button
+        $(document).off("click", ".system_button_add_delete");
+         $(document).on("click", ".system_button_add_delete", function(event)
+         {
+             $(this).closest('tr').remove();
+
+         });
+
+    });
+</script>

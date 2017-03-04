@@ -85,6 +85,30 @@ class System_helper
     }
     public static function get_farmer_barcode($id)
     {
-        return str_pad($id,10,0,STR_PAD_LEFT);
+        return 'F-'.str_pad($id,6,0,STR_PAD_LEFT);
+    }
+    public static function get_invoice_barcode($id)
+    {
+        return 'I-'.str_pad($id,8,0,STR_PAD_LEFT);
+    }
+    public static function get_farmer_from_code($code)
+    {
+        $CI =& get_instance();
+        $result=array();
+        if(substr($code,0,2)=='F-')
+        {
+            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.intval(substr($code,2))),1);
+        }
+        else if(substr($code,0,2)=='I-')
+        {
+            //Find from Invoice
+            //$result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.intval(substr($code,2))),1);
+        }
+        else
+        {
+            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('mobile_no ='.intval($code)),1);
+        }
+        return $result;
+
     }
 }

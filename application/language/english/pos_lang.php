@@ -6,6 +6,7 @@ $lang['MSG_LOGIN_SUCCESS'] = 'Successfully Logged In';
 $lang['MSG_LOGOUT_SUCCESS'] = 'Successfully Logged out';
 $lang['MSG_SITE_OFFLINE'] = 'Site is Currently Offline.Please contact with admin(09666775544.Ext.901).';
 $lang['MSG_OUTLET_NOT_ASSIGNED'] = 'No Outlet Assigned.<br>Please contact with admin(09666775544.Ext.901).';
+$lang['MSG_NOT_FOUND'] = 'Not Found';
 
 //Action buttons
 $lang['ACTION_DASHBOARD'] = 'Dashboard';
@@ -113,3 +114,13 @@ $lang['LABEL_DISCOUNT'] = 'Discount';
 $lang['LABEL_DISCOUNT_COUPON'] = 'Coupon Discount';
 $lang['LABEL_DISCOUNT_NON_COUPON'] = 'Non Coupon Discount';
 $lang['LABEL_BARCODE'] = 'Barcode';
+$lang['LABEL_INVOICE_NO'] = 'Invoice No';
+$lang['LABEL_PRICE_PACK'] = 'Price/Pack';
+$lang['LABEL_QUANTITY_GM'] = 'Quantity (gm)';
+$lang['LABEL_QUANTITY_KG'] = 'Quantity (Kg)';
+$lang['LABEL_QUANTITY_PIECES'] = 'Quantity (pieces)';
+$lang['LABEL_WEIGHT_KG'] = 'Weight (Kg)';
+$lang['LABEL_TOTAL_PRICE'] = 'Total Price';
+$lang['LABEL_CURRENT_STOCK'] = 'Current Stock';
+$lang['LABEL_CURRENT_STOCK_PIECES'] = 'Current Stock (pieces)';
+$lang['LABEL_CURRENT_STOCK_KG'] = 'Current Stock (Kg)';
