@@ -161,6 +161,41 @@ var varieties_info=[];
             });
         }
     }
+    function calculate_total()
+    {
+        var total_quantity=0;
+        $("#order_items_container tbody .quantity").each( function( index, element )
+        {
+            if($(this).val()==parseFloat($(this).val()))
+            {
+                total_quantity=total_quantity+parseFloat($(this).val());
+            }
+        });
+        $('#total_quantity').html(number_format(total_quantity,'0','.',''));
+        var total_weight=0;
+        $("#order_items_container tbody .weight").each( function( index, element ){
+            total_weight=total_weight+parseFloat($(this).html().replace(/,/g,''));
+        });
+        $('#total_weight').html(number_format(total_weight,3,'.',''));
+
+        var total_price=0;
+        $("#order_items_container tbody .price").each( function( index, element ){
+            total_price=total_price+parseFloat($(this).html().replace(/,/g,''));
+        });
+        $('#total_price').html(number_format(total_price,2));
+        var total_discount=0;
+        $('#total_discount').html(number_format(total_discount,2));
+
+        $('#total_payable').html(number_format(total_price-total_discount,2));
+        var total_paid=0;
+        if($('#total_paid').val()==parseFloat($('#total_paid').val()))
+        {
+            total_paid=parseFloat($('#total_paid').val());
+        }
+        total_change=total_paid+total_discount-total_price;
+        $('#total_change').html(number_format(total_change,2));
+
+    }
     function add_variety()
     {
         var variety_barcode=$('#variety_barcode').val();
@@ -170,14 +205,47 @@ var varieties_info=[];
         }
         else
         {
-            var content_id='#system_content_add_more table tbody';
-            $(content_id+' .crop_name').html(varieties_info[variety_barcode]['crop_name']);
-            $(content_id+' .type_name').html(varieties_info[variety_barcode]['type_name']);
-            $(content_id+' .variety_name').html(varieties_info[variety_barcode]['variety_name']);
-            $(content_id+' .pack_size').html(varieties_info[variety_barcode]['pack_size']);
-            $(content_id+' .pack_size_price').html(varieties_info[variety_barcode]['price']);
-            var html=$(content_id).html();
-            $("#order_items_container tbody").append(html);
+            if(($('#'+'quantity_'+variety_barcode).length)>0)
+            {
+                var cur_quantity=parseFloat($('#'+'quantity_'+variety_barcode).val());
+                cur_quantity=cur_quantity+1;
+                $('#'+'quantity_'+variety_barcode).val(cur_quantity);
+                $('#'+'weight_'+variety_barcode).html(number_format(cur_quantity*varieties_info[variety_barcode]['pack_size']/1000,3,'.',''));
+                $('#'+'price_'+variety_barcode).html(number_format(cur_quantity*varieties_info[variety_barcode]['price'],2));
+            }
+            else
+            {
+                var content_id='#system_content_add_more table tbody';
+                $(content_id+' .crop_name').html(varieties_info[variety_barcode]['crop_name']);
+                $(content_id+' .type_name').html(varieties_info[variety_barcode]['type_name']);
+                $(content_id+' .variety_name').html(varieties_info[variety_barcode]['variety_name']);
+
+                $(content_id+' .pack_size').html(varieties_info[variety_barcode]['pack_size']);
+                $(content_id+' .pack_size').attr('id','pack_size'+variety_barcode);
+
+                $(content_id+' .pack_size_price').html(number_format(varieties_info[variety_barcode]['price'],2));
+                $(content_id+' .pack_size_price').attr('id','pack_size_price_'+variety_barcode);
+
+                $(content_id+' .quantity').attr('id','quantity_'+variety_barcode);
+                $(content_id+' .quantity').attr('name','varieties['+varieties_info[variety_barcode]['variety_id']+']['+varieties_info[variety_barcode]['pack_id']+'][quantity]');
+
+                $(content_id+' .weight').html(number_format(varieties_info[variety_barcode]['pack_size']/1000,3,'.',''));
+                $(content_id+' .weight').attr('id','weight_'+variety_barcode);
+
+                $(content_id+' .price').html(number_format(varieties_info[variety_barcode]['price'],2));
+                $(content_id+' .price').attr('id','price_'+variety_barcode);
+
+                var html=$(content_id).html();
+                $("#order_items_container tbody").append(html);
+                $(content_id+' .pack_size').removeAttr('id');
+                $(content_id+' .pack_size_price').removeAttr('id');
+                $(content_id+' .quantity').removeAttr('id');
+                $(content_id+' .quantity').removeAttr('name');
+                $(content_id+' .weight').removeAttr('id');
+                $(content_id+' .price').removeAttr('id');
+            }
+            calculate_total();
+
             console.log(varieties_info[variety_barcode]);
         }
     }
@@ -259,11 +327,17 @@ var varieties_info=[];
 
          // Delete more button
         $(document).off("click", ".system_button_add_delete");
-         $(document).on("click", ".system_button_add_delete", function(event)
-         {
-             $(this).closest('tr').remove();
+        $(document).on("click", ".system_button_add_delete", function(event)
+        {
+         $(this).closest('tr').remove();
+         calculate_total();
 
-         });
+        });
+        $(document).off("change", "#total_paid");
+        $(document).on("change", "#total_paid", function(event)
+        {
+            calculate_total();
+        });
 
     });
 </script>

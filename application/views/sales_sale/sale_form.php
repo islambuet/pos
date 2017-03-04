@@ -78,28 +78,36 @@ $CI=& get_instance();
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="7"></td>
-                    <td>Total</td>
-                    <td>0.0</td>
-                    <td></td>
+                    <td colspan="5">&nbsp;</td>
+                    <td><label><?php echo $CI->lang->line('LABEL_TOTAL'); ?></label></td>
+                    <td class="text-right"><label id="total_quantity">&nbsp;</label></td>
+                    <td class="text-right"><label id="total_weight">&nbsp;</label></td>
+                    <td class="text-right"><label id="total_price">&nbsp;</label></td>
+                    <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td colspan="7"></td>
-                    <td>Discount</td>
-                    <td>0.0</td>
-                    <td></td>
+                    <td colspan="7">&nbsp;</td>
+                    <td><label><?php echo $CI->lang->line('LABEL_DISCOUNT'); ?></label></td>
+                    <td class="text-right"><label id="total_discount">&nbsp;</label></td>
+                    <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td colspan="7"></td>
-                    <td>payable</td>
-                    <td>0.0</td>
-                    <td></td>
+                    <td colspan="7">&nbsp;</td>
+                    <td><label>Payable</label></td>
+                    <td class="text-right"><label id="total_payable">&nbsp;</label></td>
+                    <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td colspan="7"></td>
-                    <td>Paid</td>
-                    <td>0.0</td>
-                    <td></td>
+                    <td colspan="7">&nbsp;</td>
+                    <td><label>Paid</label></td>
+                    <td class="text-right"><input id="total_paid" name="amount_paid" type="text"class="form-control text-right float_type_positive" value=""/></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="7">&nbsp;</td>
+                    <td><label>Change</label></td>
+                    <td class="text-right"><label id="total_change">&nbsp;</label></td>
+                    <td>&nbsp;</td>
                 </tr>
             </tfoot>
         </table>
@@ -122,7 +130,7 @@ $CI=& get_instance();
     <table>
         <tbody>
         <tr>
-            <td >
+            <td>
                 <label class="crop_name">&nbsp;</label>
             </td>
             <td>
@@ -141,13 +149,13 @@ $CI=& get_instance();
                 <label class="current_stock">&nbsp;</label>
             </td>
             <td class="text-right">
-                <input type="text"class="form-control text-right quantity" value=""/>
+                <input type="text"class="form-control text-right quantity integer_type_positive" value="1"/>
             </td>
             <td class="text-right">
-                <label class="total_weight">&nbsp;</label>
+                <label class="weight">&nbsp;</label>
             </td>
             <td class="text-right">
-                <label class="total_price">&nbsp;</label>
+                <label class="price">&nbsp;</label>
             </td>
             <td><button type="button" class="btn btn-danger system_button_add_delete"><?php echo $CI->lang->line('DELETE'); ?></button></td>
         </tr>

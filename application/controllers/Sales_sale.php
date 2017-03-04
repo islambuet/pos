@@ -291,6 +291,9 @@ class Sales_sale extends Root_Controller
 
     private function system_save()
     {
+        echo '<PRE>';
+        print_r($this->input->post());
+        echo '</PRE>';
         $ajax['status']=false;
         $ajax['system_message']="under Process";
         $this->json_return($ajax);
