@@ -192,7 +192,7 @@ var varieties_info=[];
         {
             total_paid=parseFloat($('#total_paid').val());
         }
-        total_change=total_paid+total_discount-total_price;
+        var total_change=total_paid+total_discount-total_price;
         $('#total_change').html(number_format(total_change,2));
 
     }
@@ -221,7 +221,7 @@ var varieties_info=[];
                 $(content_id+' .variety_name').html(varieties_info[variety_barcode]['variety_name']);
 
                 $(content_id+' .pack_size').html(varieties_info[variety_barcode]['pack_size']);
-                $(content_id+' .pack_size').attr('id','pack_size'+variety_barcode);
+                $(content_id+' .pack_size').attr('id','pack_size_'+variety_barcode);
 
                 $(content_id+' .pack_size_price').html(number_format(varieties_info[variety_barcode]['price'],2));
                 $(content_id+' .pack_size_price').attr('id','pack_size_price_'+variety_barcode);
@@ -333,9 +333,21 @@ var varieties_info=[];
          calculate_total();
 
         });
-        $(document).off("change", "#total_paid");
-        $(document).on("change", "#total_paid", function(event)
+        $(document).off("input", "#total_paid");
+        $(document).on("input", "#total_paid", function(event)
         {
+            calculate_total();
+        });
+        $(document).off("input", ".quantity");
+        $(document).on("input", ".quantity", function(event)
+        {
+            var variety_barcode=$(this).attr('id');
+            variety_barcode=variety_barcode.substr(9);
+            //var pack_size=parseFloat($('#pack_size_'+variety_barcode).val());
+
+            var quantity=parseFloat($(this).val());
+            $('#'+'weight_'+variety_barcode).html(number_format(quantity*varieties_info[variety_barcode]['pack_size']/1000,3,'.',''));
+            $('#'+'price_'+variety_barcode).html(number_format(quantity*varieties_info[variety_barcode]['price'],2));
             calculate_total();
         });
 
