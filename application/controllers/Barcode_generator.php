@@ -11,7 +11,7 @@ class Barcode_generator extends CI_Controller
     public function get_image($text)
     {
         $image_width=150;
-        $image_height=20;
+        $image_height=30;
         $code_string=$this->get_code39_string($text);
         $code_length=0;
         for ( $i=1; $i <= strlen($code_string); $i++ )

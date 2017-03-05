@@ -245,7 +245,7 @@ var varieties_info=[];
                 $(content_id+' .price').removeAttr('id');
             }
             calculate_total();
-
+            $('#variety_barcode').val('');
             console.log(varieties_info[variety_barcode]);
         }
     }
