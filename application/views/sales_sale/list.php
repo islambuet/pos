@@ -11,20 +11,6 @@ if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
     );
 }
 $action_buttons[]=array(
-    'label'=>'All',
-    'href'=>site_url($CI->controller_url.'/index/list/all')
-
-);
-if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
-{
-    $action_buttons[]=array(
-        'type'=>'button',
-        'label'=>'Sale Cancel',
-        'class'=>'button_jqx_action',
-        'data-action-link'=>site_url($CI->controller_url.'/index/edit')
-    );
-}
-$action_buttons[]=array(
     'type'=>'button',
     'label'=>$CI->lang->line("ACTION_DETAILS"),
     'class'=>'button_jqx_action',
@@ -78,11 +64,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         ?>
         <div class="col-xs-12" style="margin-bottom: 20px;">
             <div class="col-xs-12" style="margin-bottom: 20px;">
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="bar_code"><?php echo $CI->lang->line('LABEL_BARCODE'); ?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="name"><?php echo $CI->lang->line('LABEL_NAME'); ?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="farmer_type"><?php echo $CI->lang->line('LABEL_TYPE');?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="total_outlet">#Outlet</label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="mobile_no"><?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="outlet_name"><?php echo $CI->lang->line('LABEL_OUTLET_NAME'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="date_sale"><?php echo $CI->lang->line('LABEL_DATE'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="invoice_no"><?php echo $CI->lang->line('LABEL_INVOICE_NO'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="farmer_name"><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_total"><?php echo $CI->lang->line('LABEL_TOTAL');?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_discount"><?php echo $CI->lang->line('LABEL_DISCOUNT');?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_payable"><?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE');?></label>
+
             </div>
         </div>
     <?php
@@ -96,7 +85,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <script type="text/javascript">
     $(document).ready(function ()
     {
-        var url="<?php echo site_url($CI->controller_url.'/index/get_items/'.$list_type);?>";
+        var url="<?php echo site_url($CI->controller_url.'/index/get_items/');?>";
 
         // prepare the data
         var source =
@@ -104,12 +93,15 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             dataType: "json",
             dataFields: [
                 { name: 'id', type: 'int' },
-                { name: 'barcode', type: 'string' },
-                { name: 'farmer_type', type: 'string' },
-                { name: 'name', type: 'string' },
-                { name: 'group_name', type: 'string' },
-                { name: 'total_outlet', type: 'string' },
-                { name: 'mobile_no', type: 'string' }
+                { name: 'outlet_name', type: 'string' },
+                { name: 'date_sale', type: 'string' },
+                { name: 'invoice_no', type: 'string' },
+                { name: 'farmer_name', type: 'string' },
+                { name: 'amount_total', type: 'string' },
+                { name: 'amount_discount', type: 'string' },
+                { name: 'amount_payable', type: 'string' },
+                { name: 'status', type: 'string' }
+
             ],
             id: 'id',
             url: url
@@ -132,11 +124,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 altrows: true,
                 autoheight: true,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_BARCODE'); ?>', dataField: 'barcode',width:'100',cellsAlign:'right'},
-                    { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'300'},
-                    { text: '<?php echo $CI->lang->line('LABEL_TYPE'); ?>', dataField: 'farmer_type',filtertype: 'list'},
-                    { text: '#Outlet', dataField: 'total_outlet',width:'50',filtertype: 'list'},
-                    { text: '<?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?>', dataField: 'mobile_no'}
+                    { text: '<?php echo $CI->lang->line('LABEL_OUTLET_NAME'); ?>', dataField: 'outlet_name',width:'200'},
+                    { text: '<?php echo $CI->lang->line('LABEL_DATE'); ?>', dataField: 'date_sale',width:'200'},
+                    { text: '<?php echo $CI->lang->line('LABEL_INVOICE_NO'); ?>', dataField: 'invoice_no',width:'100'},
+                    { text: '<?php echo $CI->lang->line('LABEL_CUSTOMER_NAME'); ?>', dataField: 'farmer_name',width:'200'},
+                    { text: '<?php echo $CI->lang->line('LABEL_TOTAL'); ?>', dataField: 'amount_total',cellsAlign:'right'},
+                    { text: '<?php echo $CI->lang->line('LABEL_DISCOUNT'); ?>', dataField: 'amount_discount',cellsAlign:'right'},
+                    { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE'); ?>', dataField: 'amount_payable',cellsAlign:'right'}
                 ]
             });
     });

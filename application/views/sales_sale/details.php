@@ -14,91 +14,310 @@ if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
         'href'=>site_url($CI->controller_url.'/index/add')
     );
 }
-if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
+if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
 {
-    $action_buttons[]=array(
-        'label'=>$CI->lang->line("ACTION_EDIT"),
-        'href'=>site_url($CI->controller_url.'/index/edit/'.$item['id'])
-    );
-    $action_buttons[]=array(
-        'label'=>'Assign Outlet',
-        'href'=>site_url($CI->controller_url.'/index/edit_outlet/'.$item['id'])
-    );
+
+    if(System_helper::display_date(time())==System_helper::display_date($item['date_sale']))
+    {
+        $action_buttons[]=array(
+            'type'=>'button',
+            'label'=>'Sale Cancel',
+            'class'=>'button_jqx_action',
+            'data-action-link'=>site_url($CI->controller_url.'/index/delete')
+        );
+    }
 }
+
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_REFRESH"),
+    'href'=>site_url($CI->controller_url.'/index/details/'.$item['id'])
+);
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
-<div class="row widget">
-    <div class="widget-header">
-        <div class="title">
-            <?php echo $title; ?>
+<div class="row widget hidden-print">
+        <div class="widget-header">
+            <div class="title">
+                <?php echo $title; ?>
+            </div>
+            <div class="clearfix"></div>
         </div>
-        <div class="clearfix"></div>
-    </div>
-    <div class="row show-grid">
-        <div class="col-xs-4">
-            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_NAME');?></label>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_OUTLET_NAME');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo $item['outlet_name'];?></label>
+            </div>
         </div>
-        <div class="col-sm-4 col-xs-8">
-            <label class="control-label"><?php echo $item['name'];?></label>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_INVOICE_NO');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo System_helper::get_invoice_barcode($item['id']);?></label>
+            </div>
         </div>
-    </div>
-    <div class="row show-grid">
-        <div class="col-xs-4">
-            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_TYPE');?></label>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Invoice <?php echo $CI->lang->line('LABEL_DATE');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo System_helper::display_date_time($item['date_sale']);?></label>
+            </div>
         </div>
-        <div class="col-sm-4 col-xs-8">
-            <label class="control-label"><?php echo $item['type_name'];?></label>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo $item['farmer_name'];?></label>
+            </div>
         </div>
-    </div>
-    <div class="row show-grid">
-        <div class="col-xs-4">
-            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_MOBILE_NO');?></label>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_TYPE');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo $item['type_name'];?></label>
+            </div>
         </div>
-        <div class="col-sm-4 col-xs-8">
-            <label class="control-label"><?php echo $item['mobile_no'];?></label>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_MOBILE_NO');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo $item['mobile_no'];?></label>
+            </div>
         </div>
-    </div>
-    <div class="row show-grid">
-        <div class="col-xs-4">
-            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_NID');?></label>
-        </div>
-        <div class="col-sm-4 col-xs-8">
-            <label class="control-label"><?php echo $item['nid'];?></label>
-        </div>
-    </div>
-    <div class="row show-grid">
-        <div class="col-xs-4">
-            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ADDRESS');?></label>
-        </div>
-        <div class="col-sm-4 col-xs-8">
-            <label class="control-label"><?php echo $item['address'];?></label>
-        </div>
-    </div>
-    <div style="" class="row show-grid">
-        <div class="col-xs-4">
-            <label class="control-label pull-right">Assigned Outlet(s)</label>
-        </div>
-        <div class="col-sm-4 col-xs-8">
-            <?php
-            if(sizeof($assigned_outlets)>0)
-            {
-                foreach($assigned_outlets as $outlet)
-                {
-                ?>
-                    <label class="control-label"><?php echo $outlet['text']; ?></label><br>
-                <?php
-                }
-            }
-            else
-            {
-                ?>
-                <label class="control-label">No Outlet Assigned Yet.</label>
-                <?php
-            }
+        <?php
+        if(strlen($item['nid'])>0)
+        {
             ?>
-
+            <div class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_NID');?></label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo $item['nid'];?></label>
+                </div>
+            </div>
+        <?php
+        }
+        ?>
+        <?php
+        if(strlen($item['address'])>0)
+        {
+            ?>
+            <div class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ADDRESS');?></label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo $item['address'];?></label>
+                </div>
+            </div>
+        <?php
+        }
+        ?>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_DISCOUNT');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo $item['discount_percentage'];?></label>%
+            </div>
         </div>
-    </div>
-</div>
+        <div class="widget-header">
+            <div class="title">
+                Items
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div style="overflow-x: auto;" class="row show-grid" id="order_items_container">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_CROP_NAME'); ?></th>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?></th>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?></th>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_PACK_NAME'); ?></th>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_PRICE_PACK'); ?></th>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_QUANTITY_PIECES'); ?></th>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_WEIGHT_KG'); ?></th>
+                    <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_TOTAL_PRICE'); ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                $total_quantity=0;
+                $total_weight=0;
+                $total_price=0;
+                foreach($details as $row)
+                {
+                    ?>
+                    <tr>
+                        <td><label><?php echo $row['crop_name']; ?></label></td>
+                        <td><label><?php echo $row['type_name']; ?></label></td>
+                        <td><label><?php echo $row['variety_name']; ?></label></td>
+                        <td class="text-right"><label><?php echo $row['pack_size']; ?></label></td>
+                        <td class="text-right"><label><?php echo number_format($row['price_unit'],2); ?></label></td>
+                        <td class="text-right"><label><?php echo $row['quantity_sale']; ?></label></td>
+                        <td class="text-right"><label><?php echo number_format($row['quantity_sale']*$row['pack_size']/1000,3,'.',''); ?></label></td>
+                        <td class="text-right">
+                            <label>
+                                <?php
+                                $total_quantity+=$row['quantity_sale'];
+                                $total_weight+=$row['quantity_sale']*$row['pack_size'];
+                                $total_price+=$row['quantity_sale']*$row['price_unit'];
+                                    echo number_format($row['quantity_sale']*$row['price_unit'],2);
+                                ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
 
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="4">&nbsp;</td>
+                    <td><label><?php echo $CI->lang->line('LABEL_TOTAL'); ?></label></td>
+                    <td class="text-right"><label><?php echo $total_quantity; ?></label></td>
+                    <td class="text-right"><label><?php echo number_format($total_weight/1000,3,'.',''); ?></label></td>
+                    <td class="text-right"><label><?php echo number_format($total_price,2); ?></label></td>
+                </tr>
+                <tr>
+                    <td colspan="6">&nbsp;</td>
+                    <td><label><?php echo $CI->lang->line('LABEL_DISCOUNT'); ?></label></td>
+                    <td class="text-right">
+                        <label>
+                            <?php
+                            $total_discount=$total_price*$item['discount_percentage']/100;
+                            echo number_format($total_discount,2);
+                            ?>
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">&nbsp;</td>
+                    <td><label>Payable</label></td>
+                    <td class="text-right"><label><?php echo number_format($total_price-$total_discount,2); ?></label></td>
+
+                </tr>
+                <tr>
+                    <td colspan="6">&nbsp;</td>
+                    <td><label>Paid</label></td>
+                    <td class="text-right"><label><?php echo number_format($item['amount_cash'],2); ?></label></td>
+
+                </tr>
+                <tr>
+                    <td colspan="6">&nbsp;</td>
+                    <td><label>Change</label></td>
+                    <td class="text-right"><label><?php echo number_format($item['amount_cash']-$total_price+$total_discount,2); ?></label></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+</div>
+<div style="width: 400px;font-size: 13px; font-weight: bold;line-height: 17px;margin-left:-40px;padding: 10px; ">
+    <div style="font-size: 20px;line-height: 22px;text-align: center;">Malik Seeds</div>
+    <div style="font-size: 18px;line-height: 20px;text-align: center;margin-bottom: 5px;border-bottom: 2px solid #000000;"><?php echo $item['outlet_short_name'];?></div>
+    <div style="text-align: center;"><img src="<?php echo site_url('barcode_generator/get_image/'.(System_helper::get_invoice_barcode($item['id'])));  ?>"></div>
+    <div><?php echo $CI->lang->line('LABEL_DATE');?> :<?php echo System_helper::display_date_time($item['date_sale']);?></div>
+    <div><?php echo $CI->lang->line('LABEL_INVOICE_NO');?> :<?php echo System_helper::get_invoice_barcode($item['id']);?></div>
+    <div><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?> :<?php echo $item['farmer_name'];?></div>
+    <div style="margin-bottom: 5px;border-bottom: 2px solid #000000;"><?php echo $CI->lang->line('LABEL_MOBILE_NO');?> :<?php echo $item['mobile_no'];?></div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th><?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?></th>
+            <th><?php echo $CI->lang->line('LABEL_PRICE_PACK'); ?></th>
+            <th><?php echo $CI->lang->line('LABEL_QUANTITY_PIECES'); ?></th>
+            <th><?php echo $CI->lang->line('LABEL_TOTAL_PRICE'); ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        $total_quantity=0;
+        $total_weight=0;
+        $total_price=0;
+        foreach($details as $row)
+        {
+            ?>
+            <tr>
+                <td style="padding: 0 5px;"><label><?php echo $row['variety_name'].'('.$row['pack_size'].'g)'; ?></label></td>
+                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($row['price_unit'],2); ?></label></td>
+                <td style="padding: 0 5px;" class="text-right"><label><?php echo $row['quantity_sale']; ?></label></td>
+                <td style="padding: 0 5px;" class="text-right">
+                    <label>
+                        <?php
+                        $total_quantity+=$row['quantity_sale'];
+                        $total_weight+=$row['quantity_sale']*$row['pack_size'];
+                        $total_price+=$row['quantity_sale']*$row['price_unit'];
+                        echo number_format($row['quantity_sale']*$row['price_unit'],2);
+                        ?>
+                    </label>
+                </td>
+            </tr>
+        <?php
+        }
+        ?>
+
+        </tbody>
+        <tfoot>
+        <tr>
+            <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
+            <td style="padding: 0 5px;"><label><?php echo $CI->lang->line('LABEL_TOTAL'); ?> :</label></td>
+            <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($total_price,2); ?></label></td>
+        </tr>
+        <?php
+        $total_discount=$total_price*$item['discount_percentage']/100;
+        if($total_discount>0)
+        {
+            ?>
+            <tr>
+                <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
+                <td style="padding: 0 5px;"><label><?php echo $CI->lang->line('LABEL_DISCOUNT'); ?> :</label></td>
+                <td style="padding: 0 5px;" class="text-right">
+                    <label>
+                        <?php
+                        echo number_format($total_discount,2);
+                        ?>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
+                <td style="padding: 0 5px;"><label>Payable :</label></td>
+                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($total_price-$total_discount,2); ?></label></td>
+            </tr>
+
+            <?php
+        }
+        ?>
+        <tr>
+            <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
+            <td style="padding: 0 5px;"><label>Paid</label></td>
+            <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($item['amount_cash'],2); ?></label></td>
+
+        </tr>
+        <?php
+        if(($item['amount_cash']-$total_price+$total_discount)>0)
+        {
+            ?>
+            <tr>
+                <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
+                <td style="padding: 0 5px;"><label>Change</label></td>
+                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($item['amount_cash']-$total_price+$total_discount,2); ?></label></td>
+            </tr>
+
+        <?php
+        }
+        ?>
+
+        </tfoot>
+    </table>
+
+</div>
 <div class="clearfix"></div>

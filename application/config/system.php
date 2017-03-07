@@ -14,3 +14,4 @@ $config['system_status_inactive']='In-Active';
 $config['system_status_delete']='Deleted';
 $config['system_status_yes']='Yes';
 $config['system_status_no']='No';
+$config['system_status_receive']='Received';

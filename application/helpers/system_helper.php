@@ -91,24 +91,145 @@ class System_helper
     {
         return 'I-'.str_pad($id,8,0,STR_PAD_LEFT);
     }
-    public static function get_farmer_from_code($code)
+    public static function get_farmer_from_barcode($barcode,$barcode_type='any')
     {
         $CI =& get_instance();
         $result=array();
-        if(substr($code,0,2)=='F-')
+        if((substr($barcode,0,2)=='F-')&&(($barcode_type=='any')||($barcode_type=='barcode_farmer')))
         {
-            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.intval(substr($code,2))),1);
+            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.intval(substr($barcode,2))),1);
         }
-        else if(substr($code,0,2)=='I-')
+        else if((substr($barcode,0,2)=='I-')&&(($barcode_type=='any')||($barcode_type=='barcode_invoice')))
         {
             //Find from Invoice
             //$result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.intval(substr($code,2))),1);
         }
-        else
+        else if(($barcode_type=='any')||($barcode_type=='mobile_no'))
         {
-            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('mobile_no ='.intval($code)),1);
+            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('mobile_no ='.intval($barcode)),1);
         }
         return $result;
+
+    }
+    public static function get_varieties_stocks($customer_id,$variety_pack_sizes=array())
+    {
+        $CI = & get_instance();
+        $stocks=array();
+        //stock in
+        $variety_ids=array();
+
+        $where='';
+        $where_bonus='';
+        if(sizeof($variety_pack_sizes)>0)
+        {
+            foreach($variety_pack_sizes as $i=>$vp)
+            {
+                if($i==0)
+                {
+                    $where='(pod.variety_id='.$vp['variety_id'].' AND pod.pack_size_id='.$vp['pack_size_id'].')';
+                    $where_bonus='(pod.variety_id='.$vp['variety_id'].' AND pod.bonus_pack_size_id='.$vp['pack_size_id'].')';
+                }
+                else
+                {
+                    $where.='OR (pod.variety_id='.$vp['variety_id'].' AND pod.pack_size_id='.$vp['pack_size_id'].')';
+                    $where_bonus.='OR (pod.variety_id='.$vp['variety_id'].' AND pod.bonus_pack_size_id='.$vp['pack_size_id'].')';
+                }
+            }
+        }
+
+        //-sales and sales return
+        //ems Receive and sales return
+        //outlet stock in
+
+
+        $CI->db->from($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_sales_po').' po');
+
+        $CI->db->select('pod.variety_id,pod.pack_size_id');
+        $CI->db->select('SUM(por.quantity_receive) sales_receive');
+        $CI->db->select('SUM(pod.quantity_return) sales_return');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_sales_po_receives').' por','por.sales_po_id =po.id','INNER');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_sales_po_details').' pod','pod.id =por.sales_po_detail_id','INNER');
+
+        if(strlen($where)>0)
+        {
+            $CI->db->where('('.$where.')');
+        }
+        $CI->db->where('po.status_received',$CI->config->item('system_status_receive'));
+        $CI->db->where('po.customer_id',$customer_id);
+        $CI->db->where('por.revision',1);
+        $CI->db->where('pod.revision',1);
+        $CI->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+        $results=$CI->db->get()->result_array();
+        foreach($results as $result)
+        {
+            /*$stocks[$result['variety_id']][$result['pack_size_id']]['sales_receive']=$result['sales_receive'];
+            $stocks[$result['variety_id']][$result['pack_size_id']]['sales_return']=$result['sales_return'];
+            $stocks[$result['variety_id']][$result['pack_size_id']]['sales']=0;*/
+            $stocks[$result['variety_id']][$result['pack_size_id']]['current_stock']=($result['sales_receive']-$result['sales_return']);
+            $variety_ids[]=$result['variety_id'];
+        }
+        //-sales bonus receive and bonus return
+        $CI->db->from($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_sales_po').' po');
+
+        $CI->db->select('pod.variety_id,pod.bonus_pack_size_id');
+        $CI->db->select('SUM(por.quantity_bonus_receive) bonus_receive');
+        $CI->db->select('SUM(pod.quantity_bonus_return) bonus_return');
+
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_sales_po_receives').' por','por.sales_po_id =po.id','INNER');
+        $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_sales_po_details').' pod','pod.id =por.sales_po_detail_id','INNER');
+
+        if(strlen($where_bonus)>0)
+        {
+            $CI->db->where('('.$where_bonus.')');
+        }
+        $CI->db->where('po.status_received',$CI->config->item('system_status_receive'));
+        $CI->db->where('po.customer_id',$customer_id);
+        $CI->db->where('pod.bonus_details_id >',0);
+        $CI->db->where('por.revision',1);
+        $CI->db->where('pod.revision',1);
+        $CI->db->group_by(array('pod.variety_id','pod.bonus_pack_size_id'));
+        $results=$CI->db->get()->result_array();
+        foreach($results as $result)
+        {
+            if(isset($stocks[$result['variety_id']][$result['bonus_pack_size_id']]))
+            {
+                $stocks[$result['variety_id']][$result['bonus_pack_size_id']]['current_stock']+=($result['bonus_receive']-$result['bonus_return']);
+            }
+            else
+            {
+                $stocks[$result['variety_id']][$result['bonus_pack_size_id']]['current_stock']=($result['bonus_receive']-$result['bonus_return']);
+                if(!in_array($result['variety_id'],$variety_ids))
+                {
+                    $variety_ids[]=$result['variety_id'];
+                }
+            }
+
+        }
+        //stock in from ems completed
+        //sales from outlet calculation pending
+        if(sizeof($variety_ids)>0)
+        {
+            $CI->db->from($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_classification_varieties').' v');
+            $CI->db->select('v.id variety_id');
+            $CI->db->select('type.id type_id');
+            $CI->db->select('type.crop_id crop_id');
+            $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
+            $CI->db->where_in('v.id',$variety_ids);
+            $results=$CI->db->get()->result_array();
+            foreach($results as $result)
+            {
+                foreach($stocks[$result['variety_id']] as $pack_id=>&$pack_info)
+                {
+                    $pack_info['crop_id']=$result['crop_id'];
+                    $pack_info['type_id']=$result['type_id'];
+                    $pack_info['variety_id']=$result['variety_id'];
+                    $pack_info['pack_id']=$pack_id;
+
+                }
+            }
+        }
+
+        return $stocks;
 
     }
 }

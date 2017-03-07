@@ -124,20 +124,22 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     </div>
 </div>
 <script type="text/javascript">
-<?php
-     if(sizeof($varieties_info)>0)
-     {
+    <?php
+    if(sizeof($varieties_info)>0)
+    {
         ?>
-var varieties_info=JSON.parse('<?php echo JSON_encode($varieties_info);?>');
-<?php
-}
-else
-{
- ?>
-var varieties_info=[];
-<?php
-}
-?>
+        var varieties_info=JSON.parse('<?php echo json_encode($varieties_info);?>');
+        <?php
+    }
+    else
+    {
+        ?>
+        var varieties_info={};
+        <?php
+    }
+    ?>
+    var stock_info={};
+
     function search_farmer()
     {
         var customer_id=$('#customer_id').val();
@@ -151,7 +153,7 @@ var varieties_info=[];
                 data:{customer_id:customer_id,code:code},
                 success: function (data, status)
                 {
-
+                    load_stocks(data);
                 },
                 error: function (xhr, desc, err)
                 {
@@ -183,7 +185,9 @@ var varieties_info=[];
             total_price=total_price+parseFloat($(this).html().replace(/,/g,''));
         });
         $('#total_price').html(number_format(total_price,2));
-        var total_discount=0;
+        var discount=parseFloat($('#discount').html());
+        var total_discount=total_price*discount/100;
+
         $('#total_discount').html(number_format(total_discount,2));
 
         $('#total_payable').html(number_format(total_price-total_discount,2));
@@ -201,7 +205,7 @@ var varieties_info=[];
         var variety_barcode=$('#variety_barcode').val();
         if(varieties_info[variety_barcode]===undefined)
         {
-            animate_message("invalid code");
+            animate_message("Invalid Barcode.");
         }
         else
         {
@@ -225,6 +229,15 @@ var varieties_info=[];
 
                 $(content_id+' .pack_size_price').html(number_format(varieties_info[variety_barcode]['price'],2));
                 $(content_id+' .pack_size_price').attr('id','pack_size_price_'+variety_barcode);
+                $(content_id+' .current_stock').attr('id','current_stock_'+variety_barcode);
+                if(stock_info[variety_barcode]===undefined)
+                {
+                    $(content_id+' .current_stock').html(0);
+                }
+                else
+                {
+                    $(content_id+' .current_stock').html(stock_info[variety_barcode]);
+                }
 
                 $(content_id+' .quantity').attr('id','quantity_'+variety_barcode);
                 $(content_id+' .quantity').attr('name','varieties['+varieties_info[variety_barcode]['variety_id']+']['+varieties_info[variety_barcode]['pack_id']+'][quantity]');
@@ -247,6 +260,16 @@ var varieties_info=[];
             calculate_total();
             $('#variety_barcode').val('');
             console.log(varieties_info[variety_barcode]);
+        }
+    }
+    function load_stocks(data)
+    {
+        if(data['stock_info']!==undefined)
+        {
+            $.each(data['stock_info'],function(key,item)
+            {
+                stock_info[key]=item;
+            });
         }
     }
     jQuery(document).ready(function()
@@ -299,7 +322,7 @@ var varieties_info=[];
                 data:{customer_id:customer_id,mobile_no:mobile_no,name:name,address:address,nid:nid},
                 success: function (data, status)
                 {
-
+                    load_stocks(data);
                 },
                 error: function (xhr, desc, err)
                 {
@@ -322,6 +345,51 @@ var varieties_info=[];
         $(document).on("click", "#button_action_variety_add", function(event)
         {
             add_variety();
+        });
+        $(document).off("keypress", "#coupon_barcode");
+        $(document).on("keypress","#coupon_barcode",function(event)
+        {
+            if(event.which == 13)
+            {
+                var customer_id=$('#customer_id').val();
+                var coupon_barcode=$(this).val();
+                if(coupon_barcode.length>0)
+                {
+                    $('#container_discount_info').html('');
+                    $('#button_action_discount_clear').hide();
+                    $('#discount').html($('#discount_non_coupon').val());
+                    $.ajax({
+                        url:'<?php echo site_url($CI->controller_url.'/index/get_coupon_info') ?>',
+                        type: 'POST',
+                        datatype: "JSON",
+                        data:{customer_id:customer_id,coupon_barcode:coupon_barcode},
+                        success: function (data, status)
+                        {
+                        },
+                        complete: function (xhr, status)
+                        {
+                            calculate_total();
+                        },
+                        error: function (xhr, desc, err)
+                        {
+                            console.log("error");
+
+                        }
+                    });
+                }
+                $('#coupon_barcode').val('');
+                return false;
+            }
+
+        });
+        $(document).off("click", "#button_action_discount_clear");
+        $(document).on("click", "#button_action_discount_clear", function(event)
+        {
+            $('#container_discount_info').html('');
+            $('#button_action_discount_clear').hide();
+            $('#discount').html($('#discount_non_coupon').val());
+            calculate_total();
+
         });
 
 
@@ -349,6 +417,41 @@ var varieties_info=[];
             $('#'+'weight_'+variety_barcode).html(number_format(quantity*varieties_info[variety_barcode]['pack_size']/1000,3,'.',''));
             $('#'+'price_'+variety_barcode).html(number_format(quantity*varieties_info[variety_barcode]['price'],2));
             calculate_total();
+        });
+        $(document).off("submit", "#sale_form");
+        $(document).on("submit", "#sale_form", function(event)
+        {
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr("action"),
+                type: $(this).attr("method"),
+                dataType: "JSON",
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function (data, status)
+                {
+                    if(data['status']==false)
+                    {
+                        if(data['new_stock']!==undefined)
+                        {
+                            $.each(data['new_stock'],function(key,item)
+                            {
+                                stock_info[key]=item;
+                                $('#current_stock_'+key).html(item);
+                            });
+                        }
+                    }
+
+                },
+                complete: function (xhr, status)
+                {
+
+                },
+                error: function (xhr, desc, err)
+                {
+                }
+            });
         });
 
     });
