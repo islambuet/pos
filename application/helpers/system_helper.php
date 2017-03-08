@@ -89,7 +89,7 @@ class System_helper
     }
     public static function get_invoice_barcode($id)
     {
-        return 'I-'.str_pad($id,8,0,STR_PAD_LEFT);
+        return 'I-'.str_pad($id,7,0,STR_PAD_LEFT);
     }
     public static function get_farmer_from_barcode($barcode,$barcode_type='any')
     {
@@ -101,7 +101,11 @@ class System_helper
         }
         else if((substr($barcode,0,2)=='I-')&&(($barcode_type=='any')||($barcode_type=='barcode_invoice')))
         {
-            //Find from Invoice
+            $CI->db->from($CI->config->item('table_pos_sale').' sale');
+            $CI->db->join($CI->config->item('table_pos_setup_farmer_farmer').' f','f.id =sale.farmer_id','INNER');
+            $CI->db->select('f.*');
+            $CI->db->where('sale.id',intval(substr($barcode,2)));
+            $result=$CI->db->get()->row_array();
             //$result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.intval(substr($code,2))),1);
         }
         else if(($barcode_type=='any')||($barcode_type=='mobile_no'))

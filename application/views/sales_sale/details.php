@@ -27,7 +27,11 @@ if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
         );
     }
 }
-
+$action_buttons[]=array(
+    'type'=>'button',
+    'label'=>$CI->lang->line("ACTION_PRINT"),
+    'onClick'=>"window.print()"
+);
 $action_buttons[]=array(
     'label'=>$CI->lang->line("ACTION_REFRESH"),
     'href'=>site_url($CI->controller_url.'/index/details/'.$item['id'])
@@ -220,14 +224,16 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </table>
         </div>
 </div>
-<div style="width: 400px;font-size: 13px; font-weight: bold;line-height: 17px;margin-left:-40px;padding: 10px; ">
-    <div style="font-size: 20px;line-height: 22px;text-align: center;">Malik Seeds</div>
-    <div style="font-size: 18px;line-height: 20px;text-align: center;margin-bottom: 5px;border-bottom: 2px solid #000000;"><?php echo $item['outlet_short_name'];?></div>
-    <div style="text-align: center;"><img src="<?php echo site_url('barcode_generator/get_image/'.(System_helper::get_invoice_barcode($item['id'])));  ?>"></div>
-    <div><?php echo $CI->lang->line('LABEL_DATE');?> :<?php echo System_helper::display_date_time($item['date_sale']);?></div>
-    <div><?php echo $CI->lang->line('LABEL_INVOICE_NO');?> :<?php echo System_helper::get_invoice_barcode($item['id']);?></div>
-    <div><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?> :<?php echo $item['farmer_name'];?></div>
-    <div style="margin-bottom: 5px;border-bottom: 2px solid #000000;"><?php echo $CI->lang->line('LABEL_MOBILE_NO');?> :<?php echo $item['mobile_no'];?></div>
+<div style="width: 320px;font-size: 10px;text-align: center; font-weight: bold;line-height: 10px;margin-left:-40px; ">
+    <div style="font-size:14px;line-height: 16px;">Malik Seeds</div>
+    <div style="font-size:12px;line-height: 14px;"><?php echo $item['outlet_short_name'];?></div>
+    <img src="<?php echo site_url('barcode_generator/get_image/'.(System_helper::get_invoice_barcode($item['id'])));  ?>">
+    <div style="margin:5px 0;padding: 5px;border-bottom: 2px solid #000000;border-top: 2px solid #000000;text-align: left;">
+        <div><?php echo $CI->lang->line('LABEL_DATE');?> :<?php echo System_helper::display_date_time($item['date_sale']);?></div>
+        <div><?php echo $CI->lang->line('LABEL_INVOICE_NO');?> :<?php echo System_helper::get_invoice_barcode($item['id']);?></div>
+        <div><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?> :<?php echo $item['farmer_name'];?></div>
+        <div><?php echo $CI->lang->line('LABEL_MOBILE_NO');?> :<?php echo $item['mobile_no'];?></div>
+    </div>
     <table class="table">
         <thead>
         <tr>
@@ -247,8 +253,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             ?>
             <tr>
                 <td style="padding: 0 5px;"><label><?php echo $row['variety_name'].'('.$row['pack_size'].'g)'; ?></label></td>
-                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($row['price_unit'],2); ?></label></td>
-                <td style="padding: 0 5px;" class="text-right"><label><?php echo $row['quantity_sale']; ?></label></td>
+                <td style="padding: 0 5px;"><label><?php echo number_format($row['price_unit'],2); ?></label></td>
+                <td style="padding: 0 5px;"><label><?php echo $row['quantity_sale']; ?></label></td>
                 <td style="padding: 0 5px;" class="text-right">
                     <label>
                         <?php
@@ -293,7 +299,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($total_price-$total_discount,2); ?></label></td>
             </tr>
 
-            <?php
+        <?php
         }
         ?>
         <tr>
@@ -318,6 +324,4 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 
         </tfoot>
     </table>
-
 </div>
-<div class="clearfix"></div>
