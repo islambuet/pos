@@ -107,6 +107,11 @@ class Sales_sale extends Root_Controller
     }
     private function system_get_items()
     {
+        $current_records = $this->input->post('total_records');
+        if(!$current_records)
+        {
+            $current_records=0;
+        }
         $this->db->from($this->config->item('table_pos_sale').' sale');
         $this->db->select('sale.*');
         $this->db->select('cus.name outlet_name');
@@ -114,7 +119,7 @@ class Sales_sale extends Root_Controller
         $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id =sale.customer_id','INNER');
         $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
         $this->db->order_by('sale.id DESC');
-        $this->db->limit(100);
+        $this->db->limit(1,$current_records);
         $items=$this->db->get()->result_array();
         foreach($items as &$item)
         {
