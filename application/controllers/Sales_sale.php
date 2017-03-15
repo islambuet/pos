@@ -62,20 +62,17 @@ class Sales_sale extends Root_Controller
         {
             $this->system_details($id);
         }
-        /*elseif($action=="edit")
+        elseif($action=="delete")
         {
-            $this->system_edit($id);
+            $this->system_delete($id);
         }
-
-
-
-        elseif($action=="save_outlet")
-        {
-            $this->system_save_outlet();
-        }*/
         elseif($action=="save")
         {
             $this->system_save();
+        }
+        elseif($action=="save_cancel")
+        {
+            $this->system_save_cancel();
         }
         else
         {
@@ -184,9 +181,9 @@ class Sales_sale extends Root_Controller
         }
     }
 
-    private function system_edit($id)
+    private function system_delete($id)
     {
-        if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+        if(isset($this->permissions['action3']) && ($this->permissions['action3']==1))
         {
             if(($this->input->post('id')))
             {
@@ -196,17 +193,76 @@ class Sales_sale extends Root_Controller
             {
                 $item_id=$id;
             }
+            $user = User_helper::get_user();
+            $this->db->from($this->config->item('table_pos_sale').' sale');
+            $this->db->select('sale.*');
+            $this->db->select('cus.name outlet_name,cus.name_short outlet_short_name');
+            $this->db->select('f.name farmer_name,f.mobile_no,f.nid,f.address');
+            $this->db->select('ft.name type_name');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id =sale.customer_id','INNER');
+            $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+            $this->db->join($this->config->item('table_pos_setup_farmer_type').' ft','ft.id = f.type_id','INNER');
+            $this->db->where('sale.id',$item_id);
 
-            $data['item']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.$item_id),1);
-            $data['title']="Edit Farmer (".$data['item']['name'].')';
-            $data['types']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),array('id value,name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+            $data['item']=$this->db->get()->row_array();
+            if(!$data['item'])
+            {
+                System_helper::invalid_try('Sale Cancel view',$item_id,'Trying to access Invalid Sale id');
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                $this->json_return($ajax);
+                die();
+            }
+            if(!in_array($data['item']['customer_id'],$this->user_outlet_ids))
+            {
+                System_helper::invalid_try('Sale Cancel view',$item_id,'Trying to access other Outlets data');
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                $this->json_return($ajax);
+                die();
+            }
+            if($data['item']['status']!=$this->config->item('system_status_active'))
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="This sale already Canceled";
+                $this->json_return($ajax);
+                die();
+            }
+            if($data['item']['invoice_old_id']>0)
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="This sale already Reinvoiced.<br>You cannot Cancel it.";
+                $this->json_return($ajax);
+                die();
+            }
+            if(!((System_helper::display_date(time())==System_helper::display_date($data['item']['date_sale']))||($user->user_group==1)))
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="You cannot cancel this sale now";
+                $this->json_return($ajax);
+                die();
+            }
+
+            $this->db->from($this->config->item('table_pos_sale_details').' sd');
+            $this->db->select('sd.*');
+            $this->db->select('v.name variety_name');
+            $this->db->select('type.name type_name');
+            $this->db->select('crop.name crop_name');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties').' v','v.id =sd.variety_id','INNER');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crops').' crop','crop.id =type.crop_id','INNER');
+            $this->db->where('sd.sale_id',$item_id);
+
+            $data['details']=$this->db->get()->result_array();
+            $data['title']='Cancel Invoice ('.System_helper::get_invoice_barcode($item_id).')';
+
             $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/add_edit",$data,true));
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/delete",$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
             }
-            $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
+            $ajax['system_page_url']=site_url($this->controller_url.'/index/delete/'.$item_id);
             $this->json_return($ajax);
         }
         else
@@ -280,7 +336,7 @@ class Sales_sale extends Root_Controller
                 $user_ids[$data['item']['user_reinvoiced']]=$data['item']['user_reinvoiced'];
             }
             $data['users']=System_helper::get_users_info($user_ids);
-            $data['title']='Sale Details';
+            $data['title']='Sale Details of ('.System_helper::get_invoice_barcode($item_id).')';
 
             /*$this->db->from($this->config->item('table_pos_setup_farmer_outlet').' fo');
             $this->db->select('CONCAT(cus.customer_code," - ",cus.name) text');
@@ -484,6 +540,85 @@ class Sales_sale extends Root_Controller
         {
             $ajax['status']=false;
             $ajax['system_message']=$this->lang->line("MSG_SAVED_FAIL");
+            $this->json_return($ajax);
+        }
+    }
+    private function system_save_cancel()
+    {
+        if(isset($this->permissions['action3']) && ($this->permissions['action3']==1))
+        {
+            $item_id=$this->input->post('id');
+            $user = User_helper::get_user();
+            $time=time();
+            $item_info=Query_helper::get_info($this->config->item('table_pos_sale'),'*',array('id ='.$item_id),1);
+            if(!$item_info)
+            {
+                System_helper::invalid_try('Sale Cancel Save',$item_id,'Trying to access Invalid Sale id');
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                $this->json_return($ajax);
+                die();
+            }
+            if(!in_array($item_info['customer_id'],$this->user_outlet_ids))
+            {
+                System_helper::invalid_try('Sale Cancel Save',$item_id,'Trying to Cancel other Outlets data');
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                $this->json_return($ajax);
+                die();
+            }
+            if($item_info['status']!=$this->config->item('system_status_active'))
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="This sale already Canceled";
+                $this->json_return($ajax);
+                die();
+            }
+            if($item_info['invoice_old_id']>0)
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="This sale already Reinvoiced.<br>You cannot Cancel it.";
+                $this->json_return($ajax);
+                die();
+            }
+            if(!((System_helper::display_date(time())==System_helper::display_date($item_info['date_sale']))||($user->user_group==1)))
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="You cannot cancel this sale now";
+                $this->json_return($ajax);
+                die();
+            }
+            $data['remarks']=$this->input->post('remarks');
+            if(!$data['remarks'])
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="Sale Cancel Reason Required";
+                $this->json_return($ajax);
+                die();
+            }
+            $data['status']=$this->config->item('system_status_inactive');
+            $data['date_canceled']=$time;
+            $data['user_canceled']=$user->user_id;
+
+            $this->db->trans_start();  //DB Transaction Handle START
+            Query_helper::update($this->config->item('table_pos_sale'),$data,array('id ='.$item_id));
+            $this->db->trans_complete();   //DB Transaction Handle END
+            if ($this->db->trans_status() === TRUE)
+            {
+                $this->message=$this->lang->line("MSG_SAVED_SUCCESS");
+                $this->system_list();
+            }
+            else
+            {
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("MSG_SAVED_FAIL");
+                $this->json_return($ajax);
+            }
+        }
+        else
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
             $this->json_return($ajax);
         }
     }

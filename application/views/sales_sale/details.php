@@ -22,19 +22,15 @@ if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
         if(System_helper::display_date(time())==System_helper::display_date($item['date_sale']))
         {
             $action_buttons[]=array(
-                'type'=>'button',
                 'label'=>'Sale Cancel',
-                'class'=>'button_jqx_action',
-                'data-action-link'=>site_url($CI->controller_url.'/index/delete')
+                'href'=>site_url($CI->controller_url.'/index/delete/'.$item['id'])
             );
         }
         elseif($user->user_group==1)
         {
             $action_buttons[]=array(
-                'type'=>'button',
                 'label'=>'Sale Cancel',
-                'class'=>'button_jqx_action',
-                'data-action-link'=>site_url($CI->controller_url.'/index/delete')
+                'href'=>site_url($CI->controller_url.'/index/delete/'.$item['id'])
             );
         }
     }
