@@ -127,6 +127,7 @@ class Sales_sale extends Root_Controller
         $this->db->select('f.name farmer_name');
         $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id =sale.customer_id','INNER');
         $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+        $this->db->where_in('customer_id',$this->user_outlet_ids);
         $this->db->order_by('sale.id DESC');
         $this->db->limit($pagesize,$current_records);
         $items=$this->db->get()->result_array();
@@ -242,6 +243,15 @@ class Sales_sale extends Root_Controller
             $data['item']=$this->db->get()->row_array();
             if(!$data['item'])
             {
+                System_helper::invalid_try('Details',$item_id,'Trying to access Invalid Sale id');
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                $this->json_return($ajax);
+                die();
+            }
+            if(!in_array($data['item']['customer_id'],$this->user_outlet_ids))
+            {
+                System_helper::invalid_try('Details',$item_id,'Trying to access other Outlets data');
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
                 $this->json_return($ajax);
@@ -259,6 +269,17 @@ class Sales_sale extends Root_Controller
 
             $data['details']=$this->db->get()->result_array();
 
+            $user_ids=array();
+            $user_ids[$data['item']['user_created']]=$data['item']['user_created'];
+            if($data['item']['user_canceled']>0)
+            {
+                $user_ids[$data['item']['user_canceled']]=$data['item']['user_canceled'];
+            }
+            if($data['item']['user_reinvoiced']>0)
+            {
+                $user_ids[$data['item']['user_reinvoiced']]=$data['item']['user_reinvoiced'];
+            }
+            $data['users']=System_helper::get_users_info($user_ids);
             $data['title']='Sale Details';
 
             /*$this->db->from($this->config->item('table_pos_setup_farmer_outlet').' fo');
@@ -287,20 +308,28 @@ class Sales_sale extends Root_Controller
 
     private function system_save()
     {
+        $user = User_helper::get_user();
+        $time=time();
+        //check permission
         if(!(isset($this->permissions['action1']) && ($this->permissions['action1']==1)))
         {
             $ajax['status']=false;
             $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
             $this->json_return($ajax);
             die();
-
-
         }
-        $user = User_helper::get_user();
-        $time=time();
-
-        //checking validation
+        //check outlet access
         $data = $this->input->post("item");
+        if(!in_array($data['customer_id'],$this->user_outlet_ids))
+        {
+            System_helper::invalid_try('Save',0,'outlet id '.$data['customer_id'].' not assigned');
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+            $this->json_return($ajax);
+            die();
+        }
+        //checking validation
+
         $items=$this->input->post('varieties');
         //checking if input correctly
         if(sizeof($items)==0)
@@ -310,6 +339,7 @@ class Sales_sale extends Root_Controller
             $this->json_return($ajax);
             die();
         }
+
         //checking stock ok
         $variety_pack_sizes=array();
         $pack_ids=array();

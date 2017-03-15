@@ -22,6 +22,7 @@ $lang['ACTION_CLEAR'] = 'Clear';
 $lang['ACTION_DELETE'] = 'Delete';
 $lang['ACTION_PRINT'] = 'Print';
 $lang['ACTION_DOWNLOAD'] = 'Download';
+$lang['ACTION_LOAD_MORE'] = 'Load More';
 $lang['DELETE_CONFIRM'] = 'Are You sure to delete?';
 $lang['MSG_ROLE_ASSIGN_SUCCESS'] = 'Role Assign Successful.';
 

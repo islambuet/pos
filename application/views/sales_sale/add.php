@@ -259,7 +259,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             }
             calculate_total();
             $('#variety_barcode').val('');
-            console.log(varieties_info[variety_barcode]);
         }
     }
     function load_stocks(data)

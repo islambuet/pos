@@ -210,7 +210,37 @@ class System_helper
 
         }
         //stock in from ems completed
-        //sales from outlet calculation pending
+        //sales from outlet
+        $CI->db->from($CI->config->item('table_pos_sale_details').' pod');
+        $CI->db->select('pod.variety_id,pod.pack_size_id');
+        $CI->db->select('SUM(pod.quantity_sale) sale_quantity');
+        $CI->db->join($CI->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+        $CI->db->where('sale.status',$CI->config->item('system_status_active'));
+        $CI->db->where('pod.revision',1);
+        $CI->db->where('sale.customer_id',$customer_id);
+        if(strlen($where)>0)
+        {
+            $CI->db->where('('.$where.')');
+        }
+        $CI->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+        $results=$CI->db->get()->result_array();
+        foreach($results as $result)
+        {
+            if(isset($stocks[$result['variety_id']][$result['pack_size_id']]))
+            {
+                $stocks[$result['variety_id']][$result['pack_size_id']]['current_stock']-=($result['sale_quantity']);
+            }
+            else
+            {
+                $stocks[$result['variety_id']][$result['pack_size_id']]['current_stock']=(0-$result['sale_quantity']);
+                if(!in_array($result['variety_id'],$variety_ids))
+                {
+                    $variety_ids[]=$result['variety_id'];
+                }
+            }
+
+        }
+        //sales from outlet finish
         if(sizeof($variety_ids)>0)
         {
             $CI->db->from($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_classification_varieties').' v');
@@ -234,6 +264,25 @@ class System_helper
         }
 
         return $stocks;
+
+    }
+    public static function get_users_info($user_ids)
+    {
+        $CI =& get_instance();
+
+        $CI->db->from($CI->config->item('table_pos_setup_user_info').' user_info');
+        if(sizeof($user_ids)>0)
+        {
+            $CI->db->where_in('user_id',$user_ids);
+        }
+        $CI->db->where('revision',1);
+        $results=$CI->db->get()->result_array();
+        $users=array();
+        foreach($results as $result)
+        {
+            $users[$result['user_id']]=$result;
+        }
+        return $users;
 
     }
 }
