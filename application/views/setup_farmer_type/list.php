@@ -111,6 +111,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 selectionmode: 'singlerow',
                 altrows: true,
                 autoheight: true,
+                enablebrowserselection:true,
+                columnsreorder: true,
                 columns: [
                     { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name'},
                     { text: '<?php echo $CI->lang->line('LABEL_DISCOUNT_COUPON'); ?>(%)', dataField: 'discount_coupon',width:'150',cellsalign: 'right'},

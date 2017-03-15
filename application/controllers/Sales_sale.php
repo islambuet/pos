@@ -112,6 +112,15 @@ class Sales_sale extends Root_Controller
         {
             $current_records=0;
         }
+        $pagesize = $this->input->post('pagesize');
+        if(!$pagesize)
+        {
+            $pagesize=40;
+        }
+        else
+        {
+            $pagesize=$pagesize*2;
+        }
         $this->db->from($this->config->item('table_pos_sale').' sale');
         $this->db->select('sale.*');
         $this->db->select('cus.name outlet_name');
@@ -119,7 +128,7 @@ class Sales_sale extends Root_Controller
         $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id =sale.customer_id','INNER');
         $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
         $this->db->order_by('sale.id DESC');
-        $this->db->limit(1,$current_records);
+        $this->db->limit($pagesize,$current_records);
         $items=$this->db->get()->result_array();
         foreach($items as &$item)
         {

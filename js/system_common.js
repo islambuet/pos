@@ -314,7 +314,7 @@ $(document).ready(function()
         var url=jqx_source['_source']['url'];
         var data=jqx_source['_source']['data'];
         var type=jqx_source['_source']['type'];
-        var total_records=jqx_source['totalrecords'];
+        var total_records = $(jqx_grid_id).jqxGrid('getrows').length;
         if(data!==undefined)
         {
             data['total_records']=total_records;
@@ -324,6 +324,8 @@ $(document).ready(function()
             data={};
             data['total_records']=total_records;
         }
+        var datainformation = $(jqx_grid_id).jqxGrid('getdatainformation');
+        data['pagesize ']=datainformation.paginginformation.pagesize;
         $.ajax({
             url: url,
             type: type,

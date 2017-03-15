@@ -63,6 +63,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 selectionmode: 'singlerow',
                 altrows: true,
                 autoheight: true,
+                enablebrowserselection:true,
+                columnsreorder: true,
                 columns:
                     [
                         { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name'},
