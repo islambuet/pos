@@ -87,10 +87,6 @@ class System_helper
     {
         return 'F-'.str_pad($id,6,0,STR_PAD_LEFT);
     }
-    public static function get_invoice_barcode($id)
-    {
-        return 'I-'.str_pad($id,7,0,STR_PAD_LEFT);
-    }
     public static function get_farmer_from_barcode($barcode,$barcode_type='any')
     {
         $CI =& get_instance();
@@ -115,6 +111,22 @@ class System_helper
         return $result;
 
     }
+    public static function get_invoice_barcode($id)
+    {
+        return 'I-'.str_pad($id,7,0,STR_PAD_LEFT);
+    }
+    public static function get_invoice_from_barcode($barcode)
+    {
+        $CI =& get_instance();
+        $result=array();
+        if((substr($barcode,0,2)=='I-'))
+        {
+            $result=Query_helper::get_info($CI->config->item('table_pos_sale'),'*',array('id ='.intval(substr($barcode,2))),1);
+        }
+        return $result;
+
+    }
+
     public static function get_varieties_stocks($customer_id,$variety_pack_sizes=array())
     {
         $CI = & get_instance();

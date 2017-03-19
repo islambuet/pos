@@ -20,7 +20,7 @@ if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
 {
     $action_buttons[]=array(
         'label'=>'Re Invoice',
-        'href'=>site_url($CI->controller_url.'/index/re_invoice')
+        'href'=>site_url($CI->controller_url.'/index/reinvoice')
     );
 }
 if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
