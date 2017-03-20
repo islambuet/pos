@@ -336,7 +336,7 @@ $(document).ready(function()
                 if(data.length>0)
                 {
                     $(jqx_grid_id).jqxGrid('beginupdate');
-                    for (var i = 0; i < 100; i++) {
+                    for (var i = 0; i < data.length; i++) {
 
                         $(jqx_grid_id).jqxGrid('addrow', id, data[i]);
                     }

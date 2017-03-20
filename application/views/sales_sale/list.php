@@ -44,7 +44,7 @@ if(isset($CI->permissions['action5']) && ($CI->permissions['action5']==1))
 }
 $action_buttons[]=array(
     'label'=>$CI->lang->line("ACTION_REFRESH"),
-    'href'=>site_url($CI->controller_url.'/index/list/short')
+    'href'=>site_url($CI->controller_url.'/index/list')
 
 );
 $action_buttons[]=array(
