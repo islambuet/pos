@@ -170,6 +170,16 @@ $CI=& get_instance();
                 </tr>
                 <tr>
                     <td colspan="8">&nbsp;</td>
+                    <td><label>Current Payable</label></td>
+                    <td class="text-right">
+                        <label id="total_current_payable">
+                            &nbsp;
+                        </label>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="8">&nbsp;</td>
                     <td><label>Paid</label></td>
                     <td class="text-right"><input id="total_paid" name="amount_paid" type="text"class="form-control text-right float_type_positive" value=""/></td>
                     <td>&nbsp;</td>
@@ -182,6 +192,14 @@ $CI=& get_instance();
                 </tr>
             </tfoot>
         </table>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Re-Invoice Reason<span style="color:#FF0000">*</span></label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <textarea class="form-control" name="remarks"></textarea>
+        </div>
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
@@ -220,7 +238,7 @@ $CI=& get_instance();
                 <label class="current_stock">&nbsp;</label>
             </td>
             <td class="text-right">
-                <label>0</label>
+                <label>&nbsp;</label>
             </td>
             <td class="text-right">
                 <input type="text"class="form-control text-right quantity integer_type_positive" value="1"/>

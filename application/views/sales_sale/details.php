@@ -69,9 +69,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         </thead>
         <tbody>
         <?php
-        $total_quantity=0;
-        $total_weight=0;
-        $total_price=0;
         foreach($details as $row)
         {
             ?>
@@ -82,9 +79,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <td style="padding: 0 5px;" class="text-right">
                     <label>
                         <?php
-                        $total_quantity+=$row['quantity_sale'];
-                        $total_weight+=$row['quantity_sale']*$row['pack_size'];
-                        $total_price+=$row['quantity_sale']*$row['price_unit'];
                         echo number_format($row['quantity_sale']*$row['price_unit'],2);
                         ?>
                     </label>
@@ -99,10 +93,10 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         <tr>
             <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
             <td style="padding: 0 5px;"><label><?php echo $CI->lang->line('LABEL_TOTAL'); ?> :</label></td>
-            <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($total_price,2); ?></label></td>
+            <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($item['amount_total'],2); ?></label></td>
         </tr>
         <?php
-        $total_discount=$total_price*$item['discount_percentage']/100;
+        $total_discount=$item['amount_total']-$item['amount_payable'];
         if($total_discount>0)
         {
             ?>
@@ -120,9 +114,31 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <tr>
                 <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
                 <td style="padding: 0 5px;"><label>Payable :</label></td>
-                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($total_price-$total_discount,2); ?></label></td>
+                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($item['amount_payable'],2); ?></label></td>
             </tr>
-
+            <?php
+        }
+        ?>
+        <?php
+        if($item['invoice_old_id']>0)
+        {
+            ?>
+            <tr>
+                <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
+                <td style="padding: 0 5px;"><label>Previously Paid:</label></td>
+                <td style="padding: 0 5px;" class="text-right">
+                    <label>
+                        <?php
+                        echo number_format($item['amount_previous_paid'],2);
+                        ?>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
+                <td style="padding: 0 5px;"><label>Current Payable :</label></td>
+                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($item['amount_payable']-$item['amount_previous_paid'],2); ?></label></td>
+            </tr>
         <?php
         }
         ?>
@@ -133,13 +149,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 
         </tr>
         <?php
-        if(($item['amount_cash']-$total_price+$total_discount)>0)
+        if(($item['amount_cash']-$item['amount_payable']+$item['amount_previous_paid'])>0)
         {
             ?>
             <tr>
                 <td style="padding: 0 5px;" colspan="2">&nbsp;</td>
                 <td style="padding: 0 5px;"><label>Change</label></td>
-                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($item['amount_cash']-$total_price+$total_discount,2); ?></label></td>
+                <td style="padding: 0 5px;" class="text-right"><label><?php echo number_format($item['amount_cash']-$item['amount_payable']+$item['amount_previous_paid'],2); ?></label></td>
             </tr>
 
         <?php
@@ -242,6 +258,107 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="control-label"><?php echo $item['discount_percentage'];?></label>%
             </div>
         </div>
+        <?php
+        if(($item['discount_farmer_id']>0)&&($item['discount_farmer_id']!=$item['farmer_id']))
+        {
+            $discount_farmer_info=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('id ='.$item['discount_farmer_id']),1);
+            ?>
+            <div class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Coupon Holder <?php echo $CI->lang->line('LABEL_NAME');?></label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo $discount_farmer_info['name'];?></label>
+                </div>
+            </div>
+            <div class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Coupon Holder <?php echo $CI->lang->line('LABEL_MOBILE_NO');?></label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo $discount_farmer_info['mobile_no'];?></label>
+                </div>
+            </div>
+            <?php
+        }
+        ?>
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Invoice Created Time</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo System_helper::display_date_time($item['date_created']);?></label>
+            </div>
+        </div>
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Invoice Created By</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label class="control-label"><?php echo $users[$item['user_created']]['name'];?></label>
+            </div>
+        </div>
+        <?php
+        if($item['status']==$CI->config->item('system_status_inactive'))
+        {
+            ?>
+            <div style="" class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Invoice Canceled Time</label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo System_helper::display_date_time($item['date_canceled']);?></label>
+                </div>
+            </div>
+            <div style="" class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Invoice Canceled By</label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo $users[$item['user_canceled']]['name'];?></label>
+                </div>
+            </div>
+            <div style="" class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Reason</label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo $item['remarks'];?></label>
+                </div>
+            </div>
+        <?php
+        }
+        ?>
+        <?php
+        if($item['invoice_old_id']>0)
+        {
+            ?>
+            <div class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Previous <?php echo $CI->lang->line('LABEL_INVOICE_NO');?></label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo System_helper::get_invoice_barcode($item['invoice_old_id']);?></label>
+                </div>
+            </div>
+        <?php
+        }
+        ?>
+        <?php
+        if($item['invoice_new_id']>0)
+        {
+            ?>
+            <div class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">New <?php echo $CI->lang->line('LABEL_INVOICE_NO');?></label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo System_helper::get_invoice_barcode($item['invoice_new_id']);?></label>
+                </div>
+            </div>
+        <?php
+        }
+        ?>
         <div class="widget-header">
             <div class="title">
                 Items
@@ -266,7 +383,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <?php
                 $total_quantity=0;
                 $total_weight=0;
-                $total_price=0;
                 foreach($details as $row)
                 {
                     ?>
@@ -283,8 +399,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                                 <?php
                                 $total_quantity+=$row['quantity_sale'];
                                 $total_weight+=$row['quantity_sale']*$row['pack_size'];
-                                $total_price+=$row['quantity_sale']*$row['price_unit'];
-                                    echo number_format($row['quantity_sale']*$row['price_unit'],2);
+                                echo number_format($row['quantity_sale']*$row['price_unit'],2);
                                 ?>
                             </label>
                         </td>
@@ -300,37 +415,66 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     <td><label><?php echo $CI->lang->line('LABEL_TOTAL'); ?></label></td>
                     <td class="text-right"><label><?php echo $total_quantity; ?></label></td>
                     <td class="text-right"><label><?php echo number_format($total_weight/1000,3,'.',''); ?></label></td>
-                    <td class="text-right"><label><?php echo number_format($total_price,2); ?></label></td>
+                    <td class="text-right"><label><?php echo number_format($item['amount_total'],2); ?></label></td>
                 </tr>
-                <tr>
-                    <td colspan="6">&nbsp;</td>
-                    <td><label><?php echo $CI->lang->line('LABEL_DISCOUNT'); ?></label></td>
-                    <td class="text-right">
-                        <label>
-                            <?php
-                            $total_discount=$total_price*$item['discount_percentage']/100;
-                            echo number_format($total_discount,2);
-                            ?>
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6">&nbsp;</td>
-                    <td><label>Payable</label></td>
-                    <td class="text-right"><label><?php echo number_format($total_price-$total_discount,2); ?></label></td>
+                <?php
+                $total_discount=$item['amount_total']-$item['amount_payable'];
+                if($total_discount>0)
+                {
+                    ?>
+                    <tr>
+                        <td colspan="6">&nbsp;</td>
+                        <td><label><?php echo $CI->lang->line('LABEL_DISCOUNT'); ?></label></td>
+                        <td class="text-right">
+                            <label>
+                                <?php
+                                echo number_format($total_discount,2);
+                                ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">&nbsp;</td>
+                        <td><label>Payable</label></td>
+                        <td class="text-right"><label><?php echo number_format($item['amount_payable'],2); ?></label></td>
 
-                </tr>
+                    </tr>
+                <?php
+                }
+                if($item['invoice_old_id']>0)
+                {
+                    ?>
+                    <tr>
+                        <td colspan="6">&nbsp;</td>
+                        <td><label>Previously Paid</label></td>
+                        <td class="text-right"><label><?php echo number_format($item['amount_previous_paid'],2); ?></label></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">&nbsp;</td>
+                        <td><label>Current Payable</label></td>
+                        <td class="text-right"><label><?php echo number_format($item['amount_payable']-$item['amount_previous_paid'],2); ?></label></td>
+                    </tr>
+                <?php
+                }
+                ?>
                 <tr>
                     <td colspan="6">&nbsp;</td>
                     <td><label>Paid</label></td>
                     <td class="text-right"><label><?php echo number_format($item['amount_cash'],2); ?></label></td>
 
                 </tr>
-                <tr>
-                    <td colspan="6">&nbsp;</td>
-                    <td><label>Change</label></td>
-                    <td class="text-right"><label><?php echo number_format($item['amount_cash']-$total_price+$total_discount,2); ?></label></td>
-                </tr>
+                <?php
+                if(($item['amount_cash']-$item['amount_payable']+$item['amount_previous_paid'])>0)
+                {
+                    ?>
+                    <tr>
+                        <td colspan="6">&nbsp;</td>
+                        <td><label>Change</label></td>
+                        <td class="text-right"><label><?php echo number_format($item['amount_cash']-$item['amount_payable']+$item['amount_previous_paid'],2); ?></label></td>
+                    </tr>
+                <?php
+                }
+                ?>
                 </tfoot>
             </table>
         </div>

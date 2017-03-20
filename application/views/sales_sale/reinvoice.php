@@ -110,6 +110,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         $('#total_payable').html(number_format(total_price-total_discount,2));
         var previously_paid=parseFloat($('#total_previous_paid').html().replace(/,/g,''));
         $('#total_payable').html(number_format(total_price-total_discount,2));
+        $('#total_current_payable').html(number_format(total_price-total_discount-previously_paid,2));
         var total_paid=0;
         if($('#total_paid').val()==parseFloat($('#total_paid').val()))
         {
