@@ -325,7 +325,7 @@ $(document).ready(function()
             data['total_records']=total_records;
         }
         var datainformation = $(jqx_grid_id).jqxGrid('getdatainformation');
-        data['pagesize ']=datainformation.paginginformation.pagesize;
+        data['pagesize']=datainformation.paginginformation.pagesize;
         $.ajax({
             url: url,
             type: type,
