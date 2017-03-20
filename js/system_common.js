@@ -341,6 +341,7 @@ $(document).ready(function()
                         $(jqx_grid_id).jqxGrid('addrow', id, data[i]);
                     }
                     $(jqx_grid_id).jqxGrid('endupdate');
+                    $(jqx_grid_id).jqxGrid('refreshfilterrow');
                 }
                 else
                 {
