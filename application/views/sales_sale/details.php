@@ -48,7 +48,7 @@ $action_buttons[]=array(
 );
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
-<div style="width: 320px;font-size: 10px;text-align: center; font-weight: bold;line-height: 10px;margin-left:-40px; background-color: #F7F7F7;">
+<div style="width: 320px;font-size: 10px;text-align: center; font-weight: bold;line-height: 10px;margin-left:-40px;padding-bottom: 15px; background-color: #F7F7F7;">
     <div style="font-size:14px;line-height: 16px;">Malik Seeds</div>
     <div style="font-size:12px;line-height: 14px;"><?php echo $item['outlet_short_name'];?></div>
     <img src="<?php echo site_url('barcode_generator/get_image/'.(System_helper::get_invoice_barcode($item['id'])));  ?>">
@@ -58,7 +58,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         <div><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?> :<?php echo $item['farmer_name'];?></div>
         <div><?php echo $CI->lang->line('LABEL_MOBILE_NO');?> :<?php echo $item['mobile_no'];?></div>
     </div>
-    <table class="table">
+    <table class="table" style="margin-bottom: 0px;">
         <thead>
         <tr>
             <th><?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?></th>
