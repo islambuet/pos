@@ -1,18 +1,29 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-    $CI = & get_instance();
-    $action_data=array();
-    if(isset($CI->permissions['print'])&&($CI->permissions['print']==1))
-    {
-        $action_data["action_print"]='print';
-    }
-    if(isset($CI->permissions['download'])&&($CI->permissions['download']==1))
-    {
-        $action_data["action_csv"]='csv';
-    }
-    if(sizeof($action_data)>0)
-    {
-        $CI->load->view("action_buttons",$action_data);
-    }
+$CI = & get_instance();
+$action_buttons=array();
+if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
+{
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>$CI->lang->line("ACTION_PRINT"),
+        'class'=>'button_action_download',
+        'data-title'=>"Print",
+        'data-print'=>true
+    );
+}
+if(isset($CI->permissions['action5']) && ($CI->permissions['action5']==1))
+{
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>$CI->lang->line("ACTION_DOWNLOAD"),
+        'class'=>'button_action_download',
+        'data-title'=>"Download"
+    );
+}
+if(sizeof($action_buttons)>0)
+{
+    $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
+}
 
 ?>
 
@@ -24,7 +35,7 @@
         <div class="clearfix"></div>
     </div>
     <?php
-    if(isset($CI->permissions['column_headers'])&&($CI->permissions['column_headers']==1))
+    if(isset($CI->permissions['action6']) && ($CI->permissions['action6']==1))
     {
 
         ?>
@@ -32,21 +43,14 @@
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="crop_name"><?php echo $CI->lang->line('LABEL_CROP_NAME'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="crop_type_name"><?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="variety_name"><?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="stock_id"><?php echo $CI->lang->line('LABEL_STOCK_ID'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="pack_size_name"><?php echo $CI->lang->line('LABEL_PACK_NAME'); ?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="pack_size"><?php echo $CI->lang->line('LABEL_PACK_NAME'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="starting_stock">Starting Stock</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_in">Stock In</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="excess">Excess</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_return">Stock Return</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales">Sales</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="sales_return">Sales Return</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="sales_bonus">Sales Bonus</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="sales_return_bonus">Sales Bonus Return</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="short">Short</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="rnd">Rnd Sample</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="sample">Sample</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  value="demonstration">Demonstration</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales_cancel">Sales cancel</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current">Current Stock</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_price">Current unit Price</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_unit_price">Current unit Price</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_total_price">Current Stock Price</label>
         </div>
     <?php
@@ -74,21 +78,14 @@
                 { name: 'crop_name', type: 'string' },
                 { name: 'crop_type_name', type: 'string' },
                 { name: 'variety_name', type: 'string' },
-                { name: 'stock_id', type: 'string' },
-                { name: 'pack_size_name', type: 'numeric' },
+                { name: 'pack_size', type: 'string' },
                 { name: 'starting_stock', type: 'string' },
                 { name: 'stock_in', type: 'string' },
-                { name: 'excess', type: 'string' },
+                { name: 'stock_return', type: 'string' },
                 { name: 'sales', type: 'string' },
-                { name: 'sales_return', type: 'string' },
-                { name: 'sales_bonus', type: 'string' },
-                { name: 'sales_return_bonus', type: 'string' },
-                { name: 'short', type: 'string' },
-                { name: 'rnd', type: 'string' },
-                { name: 'sample', type: 'string' },
-                { name: 'demonstration', type: 'string' },
+                { name: 'sales_cancel', type: 'string' },
                 { name: 'current', type: 'string' },
-                { name: 'current_price', type: 'string' },
+                { name: 'current_unit_price', type: 'string' },
                 { name: 'current_total_price', type: 'string' }
             ],
             id: 'id',
@@ -171,21 +168,14 @@
                     { text: '<?php echo $CI->lang->line('LABEL_CROP_NAME'); ?>', dataField: 'crop_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: '<?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?>', dataField: 'crop_type_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: '<?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?>', dataField: 'variety_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_STOCK_ID'); ?>',hidden:true, dataField: 'stock_id',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Pack Size(gm)', dataField: 'pack_size_name',cellsalign: 'right',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
+                    { text: 'Pack Size(gm)', dataField: 'pack_size',cellsalign: 'right',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Starting Stock', dataField: 'starting_stock',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Stock In', dataField: 'stock_in',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Excess',hidden:true, dataField: 'excess',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
+                    { text: 'Stock Return',hidden:false, dataField: 'stock_return',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Sales', dataField: 'sales',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Sales Return',hidden:true, dataField: 'sales_return',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Sales Bonus',hidden:true, dataField: 'sales_bonus',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Sales Bonus Return',hidden:true, dataField: 'sales_return_bonus',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Short',hidden:true, dataField: 'short',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Rnd Sample',hidden:true, dataField: 'rnd',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Sample',hidden:true, dataField: 'sample',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Demonstration',hidden:true, dataField: 'demonstration',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
+                    { text: 'Sales Cancel',hidden:false, dataField: 'sales_cancel',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Current Stock', dataField: 'current',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Current unit Price', dataField: 'current_price',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
+                    { text: 'Current unit Price', dataField: 'current_unit_price',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Current Stock Price', dataField: 'current_total_price',width:'150',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer}
                 ]
             });

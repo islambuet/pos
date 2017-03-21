@@ -22,7 +22,6 @@
                         {
                             ?>
                             <select name="report[customer_id]" class="form-control">
-                                <option value=""><?php echo $this->lang->line('SELECT');?></option>
                                 <?php
                                 foreach($outlets as $row)
                                 {?>
@@ -51,13 +50,6 @@
                     <div class="col-xs-6">
                         <select id="crop_id" name="report[crop_id]" class="form-control">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                            <?php
-                            foreach($crops as $crop)
-                            {?>
-                                <option value="<?php echo $crop['value']?>"><?php echo $crop['text'];?></option>
-                            <?php
-                            }
-                            ?>
                         </select>
                     </div>
                 </div>
@@ -102,8 +94,8 @@
                 <div class="row show-grid">
                     <div class="col-xs-6">
                         <select name="report[report_type]" class="form-control">
-                            <option value="weight">Kg</option>
                             <option value="quantity">Pkt</option>
+                            <option value="weight">Kg</option>
                         </select>
 
                     </div>
@@ -140,6 +132,8 @@
     jQuery(document).ready(function()
     {
         $(".date_large").datepicker({dateFormat : display_date_format,changeMonth: true,changeYear: true,yearRange: "2015:+0"});
+        $("#crop_id").html(get_dropdown_with_select(system_crops));
+        $(document).off("change", "#crop_id");
         $(document).on("change","#crop_id",function()
         {
             $("#crop_type_id").val("");
@@ -150,22 +144,10 @@
             {
                 $('#crop_type_id_container').show();
                 $('#variety_id_container').hide();
-
-                $.ajax({
-                    url: base_url+"common_controller/get_dropdown_croptypes_by_cropid/",
-                    type: 'POST',
-                    datatype: "JSON",
-                    data:{crop_id:crop_id},
-                    success: function (data, status)
-                    {
-
-                    },
-                    error: function (xhr, desc, err)
-                    {
-                        console.log("error");
-
-                    }
-                });
+                if(system_types[crop_id]!==undefined)
+                {
+                    $("#crop_type_id").html(get_dropdown_with_select(system_types[crop_id]));
+                }
             }
             else
             {
@@ -174,31 +156,19 @@
 
             }
         });
+        $(document).off("change", "#crop_type_id");
         $(document).on("change","#crop_type_id",function()
         {
 
             $("#variety_id").val("");
-
             var crop_type_id=$('#crop_type_id').val();
             if(crop_type_id>0)
             {
                 $('#variety_id_container').show();
-
-                $.ajax({
-                    url: base_url+"common_controller/get_dropdown_armvarieties_by_croptypeid/",
-                    type: 'POST',
-                    datatype: "JSON",
-                    data:{crop_type_id:crop_type_id},
-                    success: function (data, status)
-                    {
-
-                    },
-                    error: function (xhr, desc, err)
-                    {
-                        console.log("error");
-
-                    }
-                });
+                if(system_varieties[crop_type_id]!==undefined)
+                {
+                    $("#variety_id").html(get_dropdown_with_select(system_varieties[crop_type_id]));
+                }
             }
             else
             {
@@ -206,48 +176,5 @@
 
             }
         });
-        $(document).on("change","#variety_id",function()
-        {
-            $("#pack_size_id").val("");
-            var variety_id=$('#variety_id').val();
-            var warehouse_id=$('#warehouse_id').val();
-            if(variety_id>0)
-            {
-
-                $.ajax({
-                    url: base_url+"common_controller/get_dropdown_packsizes_by_variety_warehouse/",
-                    type: 'POST',
-                    datatype: "JSON",
-                    data:{variety_id:variety_id,warehouse_id:warehouse_id},
-                    success: function (data, status)
-                    {
-
-                    },
-                    error: function (xhr, desc, err)
-                    {
-                        console.log("error");
-
-                    }
-                });
-            }
-            else
-            {
-                $.ajax({
-                    url: base_url+"common_controller/get_dropdown_allpack_sizes/",
-                    type: 'POST',
-                    datatype: "JSON",
-                    success: function (data, status)
-                    {
-
-                    },
-                    error: function (xhr, desc, err)
-                    {
-                        console.log("error");
-
-                    }
-                });
-            }
-        });
-
     });
 </script>

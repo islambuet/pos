@@ -1,11 +1,24 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI = & get_instance();
+$system_crops=Query_helper::get_info($CI->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crops'),array('id value,name text'),array('status ="'.$CI->config->item('system_status_active').'"'),0,0,array('ordering'));
+$results=Query_helper::get_info($CI->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types'),array('id value,name text,crop_id'),array('status ="'.$CI->config->item('system_status_active').'"'),0,0,array('ordering'));
+$system_types=array();
+foreach($results as $result)
+{
+    $system_types[$result['crop_id']][]=$result;
+}
+$results=Query_helper::get_info($CI->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties'),array('id value,name text,crop_type_id'),array('status ="'.$CI->config->item('system_status_active').'"','whose ="ARM"'),0,0,array('ordering'));
+$system_varieties=array();
+foreach($results as $result)
+{
+    $system_varieties[$result['crop_type_id']][]=$result;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>POS</title>
+        <title>Demo POS</title>
         <link rel="icon" type="image/ico" href="http://180.234.223.203/login/images/favicon.ico"/>
         <meta charset="utf-8">
         <link rel="stylesheet" href="<?php echo base_url('css/bootstrap.min.css');?>">
@@ -58,6 +71,9 @@ $CI = & get_instance();
             var base_url = "<?php echo base_url(); ?>";
             var display_date_format = "dd-M-yy";
             var SELECT_ONE_ITEM = "<?php echo $CI->lang->line('SELECT_ONE_ITEM'); ?>";
+            var system_crops=JSON.parse('<?php echo json_encode($system_crops);?>');
+            var system_types=JSON.parse('<?php echo json_encode($system_types);?>');
+            var system_varieties=JSON.parse('<?php echo json_encode($system_varieties);?>');
         </script>
         <header class="hidden-print">
 
