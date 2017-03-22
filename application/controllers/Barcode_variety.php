@@ -160,7 +160,15 @@ class Barcode_variety extends Root_Controller
             $data['item']['outlet']=$item['outlet'];
             $data['item']['bar_code']=System_helper::get_variety_barcode($data['item']['crop_id'],$data['item']['variety_id'],$data['item']['pack_id']);
             $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/barcode",$data,true));
+            if($item['barcode_purpose']=='packet')
+            {
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/barcode_packet",$data,true));
+            }
+            else
+            {
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/barcode",$data,true));
+            }
+
 
             $this->json_return($ajax);
         }
