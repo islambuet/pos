@@ -60,6 +60,27 @@
             });
 
         });
+        $(document).off("click", ".pop_up");
+        $(document).on("click", ".pop_up", function(event)
+        {
+            var left=((($(window).width() - 550) / 2) +$(window).scrollLeft());
+            var top=((($(window).height() - 550) / 2) +$(window).scrollTop());
+            $("#popup_window").jqxWindow({position: { x: left, y: top  }});
+            $.ajax(
+                {
+                    url: $(this).attr('data-action-link'),
+                    type: 'POST',
+                    datatype: "JSON",
+                    success: function (data, status)
+                    {
+                    },
+                    error: function (xhr, desc, err)
+                    {
+                        console.log("error");
+                    }
+                });
+            $("#popup_window").jqxWindow('open');
+        });
 
     });
 </script>

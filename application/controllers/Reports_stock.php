@@ -454,6 +454,8 @@ class Reports_stock extends Root_Controller
                         $crop_total['sales']=$type_total['sales']=0;
                         $crop_total['sales_cancel']=$type_total['sales_cancel']=0;
                         $crop_total['current_total_price']=$type_total['current_total_price']=0;
+                        $prev_crop_name=$info['crop_name'];
+                        $prev_type_name=$info['type_name'];
                         //sum and reset type total
                         //sum and reset crop total
                     }
@@ -467,6 +469,7 @@ class Reports_stock extends Root_Controller
                         $type_total['sales_cancel']=0;
                         $type_total['current_total_price']=0;
                         $info['crop_name']='';
+                        $prev_type_name=$info['type_name'];
                         //sum and reset type total
                     }
                     else

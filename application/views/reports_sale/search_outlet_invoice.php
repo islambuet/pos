@@ -61,18 +61,6 @@ $CI = & get_instance();
                         <label class="control-label"><?php echo $this->lang->line('LABEL_DATE_END');?></label>
                     </div>
                 </div>
-                <div class="row show-grid">
-                    <div class="col-xs-6">
-                        <select name="report[report_type]" class="form-control">
-                            <option value="quantity">Pkt</option>
-                            <option value="weight">Kg</option>
-                        </select>
-
-                    </div>
-                    <div class="col-xs-6">
-                        <label class="control-label">Kg/Pkt</label>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="row show-grid">

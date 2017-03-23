@@ -40,19 +40,20 @@ if(sizeof($action_buttons)>0)
 
         ?>
         <div class="col-xs-12" style="margin-bottom: 20px;">
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="crop_name"><?php echo $CI->lang->line('LABEL_CROP_NAME'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="type_name"><?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="variety_name"><?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="pack_size"><?php echo $CI->lang->line('LABEL_PACK_NAME'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="starting_stock">Starting Stock</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_in">Stock In</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_return">Stock Return</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales">Sales</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales_cancel">Sales cancel</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales_actual">Actual sale</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_stock">Current Stock</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_unit_price">Current unit Price</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_total_price">Current Stock Price</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="outlet_name"><?php echo $CI->lang->line('LABEL_OUTLET_NAME'); ?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="date_sale">Sale <?php echo $CI->lang->line('LABEL_DATE'); ?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="date_canceled">Cancel <?php echo $CI->lang->line('LABEL_DATE'); ?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="invoice_no"><?php echo $CI->lang->line('LABEL_INVOICE_NO'); ?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="farmer_name"><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_total"><?php echo $CI->lang->line('LABEL_TOTAL');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_discount"><?php echo $CI->lang->line('LABEL_DISCOUNT');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_payable"><?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_actual">Actual amount</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="invoice_old_id">Old Invoice No</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="invoice_new_id">New Invoice No</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="remarks"><?php echo $CI->lang->line('LABEL_REMARKS');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button"><?php echo $CI->lang->line('ACTION_DETAILS');?></label>
+
         </div>
     <?php
     }
@@ -76,21 +77,21 @@ if(sizeof($action_buttons)>0)
             dataType: "json",
             dataFields: [
                 { name: 'id', type: 'int' },
-                { name: 'crop_name', type: 'string' },
-                { name: 'type_name', type: 'string' },
-                { name: 'variety_name', type: 'string' },
-                { name: 'pack_size', type: 'string' },
-                { name: 'starting_stock', type: 'string' },
-                { name: 'stock_in', type: 'string' },
-                { name: 'stock_return', type: 'string' },
-                { name: 'sales', type: 'string' },
-                { name: 'sales_cancel', type: 'string' },
-                { name: 'sales_actual', type: 'string' },
-                { name: 'current_stock', type: 'string' },
-                { name: 'current_unit_price', type: 'string' },
-                { name: 'current_total_price', type: 'string' }
+                { name: 'outlet_name', type: 'string' },
+                { name: 'date_sale', type: 'string' },
+                { name: 'date_canceled', type: 'string' },
+                { name: 'invoice_no', type: 'string' },
+                { name: 'farmer_name', type: 'string' },
+                { name: 'amount_total', type: 'string' },
+                { name: 'amount_discount', type: 'string' },
+                { name: 'amount_payable', type: 'string' },
+                { name: 'amount_actual', type: 'string' },
+                { name: 'invoice_old_id', type: 'string' },
+                { name: 'invoice_new_id', type: 'string' },
+                { name: 'remarks', type: 'string' },
+                { name: 'details_button', type: 'string' },
+                { name: 'status', type: 'string' }
             ],
-            id: 'id',
             url: url,
             type: 'POST',
             data:JSON.parse('<?php echo json_encode($options);?>')
@@ -99,26 +100,18 @@ if(sizeof($action_buttons)>0)
         {
             var element = $(defaultHtml);
            // console.log(defaultHtml);
-
-            if (record.variety_name=="Total Type")
+            if ((record.status=='In-Active')&& (column!="outlet_name")&& (column!="date_sale")&& (column!="invoice_no")&& (column!="details_button"))
             {
-                if(!((column=='crop_name')||(column=='type_name')))
+                element.css({ 'background-color': '#FF0000','margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
+            }
+            else if (record.date_sale=="Outlet Total")
+            {
+                if(!((column=='details_button')))
                 {
                     element.css({ 'background-color': '#6CAB44','margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
                 }
             }
-            else if (record.type_name=="Total Crop")
-            {
-
-
-                if((column!='crop_name'))
-                {
-                    element.css({ 'background-color': '#0CA2C5','margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
-
-                }
-
-            }
-            else if (record.crop_name=="Grand Total")
+            else if (record.date_sale=="Grand Total")
             {
 
                 element.css({ 'background-color': grand_total_color,'margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
@@ -128,7 +121,19 @@ if(sizeof($action_buttons)>0)
             {
                 element.css({'margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
             }
+            if(column=='details_button')
+            {
+                if(record.details_button)
+                {
+                    element.html('<div><button class="btn btn-primary pop_up" data-action-link="<?php echo site_url($CI->controller_url.'/index/details_invoice'); ?>/'+record.id+'">View Details</button><a class="btn btn-primary" style="margin-left:5px;" href="<?php echo site_url('sales_sale/index/details'); ?>/'+record.id+'">Go To Invoice</button></div>');
+                }
+                else
+                {
+                    element.html('');
+                }
 
+
+            }
             return element[0].outerHTML;
 
         };
@@ -137,7 +142,7 @@ if(sizeof($action_buttons)>0)
         };
         var aggregates=function (total, column, element, record)
         {
-            if(record.crop_name=="Grand Total")
+            if(record.date_sale=="Grand Total")
             {
                 //console.log(element);
                 return record[element];
@@ -165,21 +170,21 @@ if(sizeof($action_buttons)>0)
                 enabletooltips: true,
                 showaggregates: true,
                 showstatusbar: true,
-                rowsheight: 35,
+                rowsheight: 40,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_CROP_NAME'); ?>', dataField: 'crop_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?>', dataField: 'type_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?>', dataField: 'variety_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Pack Size(gm)', dataField: 'pack_size',cellsalign: 'right',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Starting Stock', dataField: 'starting_stock',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Stock In', dataField: 'stock_in',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Stock Return',hidden:false, dataField: 'stock_return',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Sales', dataField: 'sales',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Sales Cancel',hidden:false, dataField: 'sales_cancel',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Actual Sale',hidden:false, dataField: 'sales_actual',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Current Stock', dataField: 'current_stock',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Current unit Price', dataField: 'current_unit_price',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Current Stock Price', dataField: 'current_total_price',width:'150',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer}
+                    { text: '<?php echo $CI->lang->line('LABEL_OUTLET_NAME'); ?>',hidden:true, dataField: 'outlet_name',width:'200',cellsrenderer: cellsrenderer},
+                    { text: 'Sale <?php echo $CI->lang->line('LABEL_DATE'); ?>', dataField: 'date_sale',width:'200',cellsrenderer: cellsrenderer},
+                    { text: 'Cancel <?php echo $CI->lang->line('LABEL_DATE'); ?>',hidden:true, dataField: 'date_canceled',width:'200',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_INVOICE_NO'); ?>', dataField: 'invoice_no',width:'100',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_CUSTOMER_NAME'); ?>', dataField: 'farmer_name',width:'200',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_TOTAL'); ?>', dataField: 'amount_total',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_DISCOUNT'); ?>', dataField: 'amount_discount',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE'); ?>', dataField: 'amount_payable',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
+                    { text: 'Actual amount', dataField: 'amount_actual',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
+                    { text: 'Old Invoice no',hidden:true, dataField: 'invoice_old_id',width:'100',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}]},
+                    { text: 'New Invoice no',hidden:true, dataField: 'invoice_new_id',width:'100',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}]},
+                    { text: '<?php echo $CI->lang->line('LABEL_REMARKS'); ?>',hidden:true, dataField: 'remarks',width:'200',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('ACTION_DETAILS'); ?>',dataField: 'details_button',width:'250',cellsrenderer:cellsrenderer}
                 ]
             });
     });
