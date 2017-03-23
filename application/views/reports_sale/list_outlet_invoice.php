@@ -68,7 +68,7 @@ if(sizeof($action_buttons)>0)
         //var grand_total_color='#AEC2DD';
         var grand_total_color='#AEC2DD';
 
-        var url = "<?php echo base_url($CI->controller_url.'/get_items');?>";
+        var url = "<?php echo base_url($CI->controller_url.'/get_items_outlet_invoice');?>";
 
         // prepare the data
         var source =

@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Reports_stock extends Root_Controller
+class Reports_sale extends Root_Controller
 {
     private  $message;
     public $permissions;
@@ -11,8 +11,8 @@ class Reports_stock extends Root_Controller
     {
         parent::__construct();
         $this->message="";
-        $this->permissions=User_helper::get_permission('Reports_stock');
-        $this->controller_url='reports_stock';
+        $this->permissions=User_helper::get_permission('Reports_sale');
+        $this->controller_url='reports_sale';
         $this->user_outlet_ids=array();
         $this->user_outlets=User_helper::get_assigned_outlets();
         if(sizeof($this->user_outlets)>0)
@@ -48,17 +48,25 @@ class Reports_stock extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']="Stock Report Search";
+            $data['title']="Sale Report Search";
             $ajax['status']=true;
-            $data['outlets']=$this->user_outlets;
-            $data['date_start']='';
-            $data['date_end']=System_helper::display_date(time());
-            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/search",$data,true));
+            $report_name=$this->input->post('report_name');
+            if($report_name=='outlet_invoice')
+            {
+                $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_outlet_invoice",$data,true));
+            }
+            else
+            {
+                $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/search",$data,true));
+                $ajax['system_page_url']=site_url($this->controller_url);
+            }
+
+
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
             }
-            $ajax['system_page_url']=site_url($this->controller_url);
+
             $this->json_return($ajax);
         }
         else
@@ -75,6 +83,7 @@ class Reports_stock extends Root_Controller
 
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
+            $report_name=$this->input->post('report_name');
             $reports=$this->input->post('report');
             $reports['date_end']=System_helper::get_time($reports['date_end']);
             $reports['date_end']=$reports['date_end']+3600*24-1;
@@ -85,20 +94,33 @@ class Reports_stock extends Root_Controller
                 $ajax['system_message']='Starting Date should be less than End date';
                 $this->json_return($ajax);
             }
-
             $data['options']=$reports;
-
             if($reports['report_type']=='weight')
             {
-                $data['title']="Stock Report In Kg";
+                $data['title']=" Report In Kg";
             }
             else
             {
-                $data['title']="Stock Report In Quantity";
+                $data['title']=" Report In Quantity";
             }
 
             $ajax['status']=true;
-            $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list",$data,true));
+            if($report_name=='outlet_invoice')
+            {
+                if(!isset($reports['customer_ids']))
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']='Please Select at least one outlet';
+                    $this->json_return($ajax);
+                    die();
+                }
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_outlet_invoice",$data,true));
+            }
+            else
+            {
+                $this->message='Invalid Report type';
+            }
+
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -114,10 +136,15 @@ class Reports_stock extends Root_Controller
         }
 
     }
-    public function get_items()
+    public function get_items_outlet_invoice()
     {
+        $customer_ids=$this->input->post('customer_ids');
+        echo '<pre>';
+        print_r($customer_ids);
+        echo '</pre>';
+        die();
         $report_type=$this->input->post('report_type');
-        $customer_id=$this->input->post('customer_id');
+
         $crop_id=$this->input->post('crop_id');
         $crop_type_id=$this->input->post('crop_type_id');
         $variety_id=$this->input->post('variety_id');
