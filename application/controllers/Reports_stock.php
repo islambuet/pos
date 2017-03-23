@@ -185,6 +185,8 @@ class Reports_stock extends Root_Controller
                 $stocks[$result['variety_id']][$result['pack_size_id']]['starting_stock']=0;
                 $stocks[$result['variety_id']][$result['pack_size_id']]['stock_in']=0;
                 $stocks[$result['variety_id']][$result['pack_size_id']]['stock_return']=0;
+                $stocks[$result['variety_id']][$result['pack_size_id']]['sales']=0;
+                $stocks[$result['variety_id']][$result['pack_size_id']]['sales_cancel']=0;
             }
             if($result['bonus_pack_size_id']>0)
             {
@@ -201,6 +203,8 @@ class Reports_stock extends Root_Controller
                     $stocks[$result['variety_id']][$result['bonus_pack_size_id']]['starting_stock']=0;
                     $stocks[$result['variety_id']][$result['bonus_pack_size_id']]['stock_in']=0;
                     $stocks[$result['variety_id']][$result['bonus_pack_size_id']]['stock_return']=0;
+                    $stocks[$result['variety_id']][$result['bonus_pack_size_id']]['sales']=0;
+                    $stocks[$result['variety_id']][$result['bonus_pack_size_id']]['sales_cancel']=0;
                 }
             }
             if($report_type=='weight')
@@ -247,6 +251,170 @@ class Reports_stock extends Root_Controller
                 }
             }
         }
+        //sale count upto starting days
+        if($date_start>0)
+        {
+            $this->db->from($this->config->item('table_pos_sale_details').' pod');
+            $this->db->select('pod.variety_id,pod.pack_size_id,pod.pack_size');
+            $this->db->select('SUM(pod.quantity_sale) quantity');
+            $this->db->join($this->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties').' v','v.id =pod.variety_id','INNER');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
+            //$this->db->where('sale.status',$this->config->item('system_status_active'));
+            $this->db->where('pod.revision',1);
+            $this->db->where('sale.customer_id',$customer_id);
+            $this->db->where('sale.date_sale <',$date_start);
+            if($crop_id>0)
+            {
+                $this->db->where('type.crop_id',$crop_id);
+            }
+            if($crop_type_id>0)
+            {
+                $this->db->where('type.id',$crop_type_id);
+            }
+            if($variety_id>0)
+            {
+                $this->db->where('v.id',$variety_id);
+            }
+            $this->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+            $results=$this->db->get()->result_array();
+            foreach($results as $result)
+            {
+                if($report_type=='weight')
+                {
+                    $result['quantity']=$result['quantity']*$result['pack_size'];
+                }
+                $stocks[$result['variety_id']][$result['pack_size_id']]['starting_stock']-=$result['quantity'];
+            }
+            //sale cancel
+            $this->db->from($this->config->item('table_pos_sale_details').' pod');
+            $this->db->select('pod.variety_id,pod.pack_size_id,pod.pack_size');
+            $this->db->select('SUM(pod.quantity_sale) quantity');
+            $this->db->join($this->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties').' v','v.id =pod.variety_id','INNER');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
+            $this->db->where('sale.status',$this->config->item('system_status_inactive'));
+            $this->db->where('pod.revision',1);
+            $this->db->where('sale.customer_id',$customer_id);
+            $this->db->where('sale.date_canceled <',$date_start);
+            if($crop_id>0)
+            {
+                $this->db->where('type.crop_id',$crop_id);
+            }
+            if($crop_type_id>0)
+            {
+                $this->db->where('type.id',$crop_type_id);
+            }
+            if($variety_id>0)
+            {
+                $this->db->where('v.id',$variety_id);
+            }
+            $this->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+            $results=$this->db->get()->result_array();
+            foreach($results as $result)
+            {
+                if($report_type=='weight')
+                {
+                    $result['quantity']=$result['quantity']*$result['pack_size'];
+                }
+                $stocks[$result['variety_id']][$result['pack_size_id']]['starting_stock']+=$result['quantity'];
+            }
+
+        }
+        //sale count start to end
+        $this->db->from($this->config->item('table_pos_sale_details').' pod');
+        $this->db->select('pod.variety_id,pod.pack_size_id,pod.pack_size');
+        $this->db->select('SUM(pod.quantity_sale) quantity');
+        $this->db->join($this->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties').' v','v.id =pod.variety_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
+        //$this->db->where('sale.status',$this->config->item('system_status_active'));
+        $this->db->where('pod.revision',1);
+        $this->db->where('sale.customer_id',$customer_id);
+        $this->db->where('sale.date_sale <=',$date_end);
+        $this->db->where('sale.date_sale >=',$date_start);
+        if($crop_id>0)
+        {
+            $this->db->where('type.crop_id',$crop_id);
+        }
+        if($crop_type_id>0)
+        {
+            $this->db->where('type.id',$crop_type_id);
+        }
+        if($variety_id>0)
+        {
+            $this->db->where('v.id',$variety_id);
+        }
+        $this->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+        $results=$this->db->get()->result_array();
+        foreach($results as $result)
+        {
+            if($report_type=='weight')
+            {
+                $result['quantity']=$result['quantity']*$result['pack_size'];
+            }
+            $stocks[$result['variety_id']][$result['pack_size_id']]['sales']=$result['quantity'];
+        }
+        //sale cancel
+        $this->db->from($this->config->item('table_pos_sale_details').' pod');
+        $this->db->select('pod.variety_id,pod.pack_size_id,pod.pack_size');
+        $this->db->select('SUM(pod.quantity_sale) quantity');
+        $this->db->join($this->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties').' v','v.id =pod.variety_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
+        $this->db->where('sale.status',$this->config->item('system_status_inactive'));
+        $this->db->where('pod.revision',1);
+        $this->db->where('sale.customer_id',$customer_id);
+        $this->db->where('sale.date_canceled <=',$date_end);
+        $this->db->where('sale.date_canceled >=',$date_start);
+        if($crop_id>0)
+        {
+            $this->db->where('type.crop_id',$crop_id);
+        }
+        if($crop_type_id>0)
+        {
+            $this->db->where('type.id',$crop_type_id);
+        }
+        if($variety_id>0)
+        {
+            $this->db->where('v.id',$variety_id);
+        }
+        $this->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+        $results=$this->db->get()->result_array();
+        foreach($results as $result)
+        {
+            if($report_type=='weight')
+            {
+                $result['quantity']=$result['quantity']*$result['pack_size'];
+            }
+            $stocks[$result['variety_id']][$result['pack_size_id']]['sales_cancel']=$result['quantity'];
+        }
+        $this->db->from($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_variety_price').' vp');
+        $this->db->select('vp.variety_id,vp.pack_size_id,vp.price');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties').' v','v.id =vp.variety_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id = v.crop_type_id','INNER');
+        $this->db->where('vp.revision',1);
+        if($crop_id>0)
+        {
+            $this->db->where('type.crop_id',$crop_id);
+        }
+        if($crop_type_id>0)
+        {
+            $this->db->where('type.id',$crop_type_id);
+        }
+        if($variety_id>0)
+        {
+            $this->db->where('v.id',$variety_id);
+        }
+        $prices=array();
+
+        $results=$this->db->get()->result_array();
+
+        foreach($results as $result)
+        {
+            $prices[$result['variety_id']][$result['pack_size_id']]=$result['price'];
+        }
+
         $type_total=array();
         $crop_total=array();
         $grand_total=array();
@@ -267,6 +435,10 @@ class Reports_stock extends Root_Controller
         $grand_total['starting_stock']=$crop_total['starting_stock']=$type_total['starting_stock']=0;
         $grand_total['stock_in']=$crop_total['stock_in']=$type_total['stock_in']=0;
         $grand_total['stock_return']=$crop_total['stock_return']=$type_total['stock_return']=0;
+        $grand_total['sales']=$crop_total['sales']=$type_total['sales']=0;
+        $grand_total['sales_cancel']=$crop_total['sales_cancel']=$type_total['sales_cancel']=0;
+        $grand_total['current_unit_price']=$crop_total['current_unit_price']=$type_total['current_unit_price']='';
+        $grand_total['current_total_price']=$crop_total['current_total_price']=$type_total['current_total_price']=0;
 
         $items=array();
         $prev_crop_name='';
@@ -285,6 +457,9 @@ class Reports_stock extends Root_Controller
                         $crop_total['starting_stock']=$type_total['starting_stock']=0;
                         $crop_total['stock_in']=$type_total['stock_in']=0;
                         $crop_total['stock_return']=$type_total['stock_return']=0;
+                        $crop_total['sales']=$type_total['sales']=0;
+                        $crop_total['sales_cancel']=$type_total['sales_cancel']=0;
+                        $crop_total['current_total_price']=$type_total['current_total_price']=0;
                         //sum and reset type total
                         //sum and reset crop total
                     }
@@ -294,6 +469,9 @@ class Reports_stock extends Root_Controller
                         $type_total['starting_stock']=0;
                         $type_total['stock_in']=0;
                         $type_total['stock_return']=0;
+                        $type_total['sales']=0;
+                        $type_total['sales_cancel']=0;
+                        $type_total['current_total_price']=0;
                         $info['crop_name']='';
                         //sum and reset type total
                     }
@@ -318,6 +496,35 @@ class Reports_stock extends Root_Controller
                 $grand_total['stock_return']+=$info['stock_return'];
                 $crop_total['stock_return']+=$info['stock_return'];
                 $type_total['stock_return']+=$info['stock_return'];
+                $grand_total['sales']+=$info['sales'];
+                $crop_total['sales']+=$info['sales'];
+                $type_total['sales']+=$info['sales'];
+                $grand_total['sales_cancel']+=$info['sales_cancel'];
+                $crop_total['sales_cancel']+=$info['sales_cancel'];
+                $type_total['sales_cancel']+=$info['sales_cancel'];
+                if(isset($prices[$variety_id][$pack_size_id]))
+                {
+                    $cur_stock=$info['starting_stock']+$info['stock_in']-$info['stock_return']-$info['sales']+$info['sales_cancel'];
+                    $info['current_unit_price']=$prices[$variety_id][$pack_size_id];
+
+                    if($report_type=='weight')
+                    {
+                        $info['current_unit_price']=($prices[$variety_id][$pack_size_id]*1000/$info['pack_size']);
+                        $info['current_total_price']=$cur_stock*$prices[$variety_id][$pack_size_id]/$info['pack_size'];
+                    }
+                    else
+                    {
+                        $info['current_total_price']=$cur_stock*$prices[$variety_id][$pack_size_id];
+                    }
+                }
+                else
+                {
+                    $info['current_unit_price']=0;
+                    $info['current_total_price']=0;
+                }
+                $grand_total['current_total_price']+=$info['current_total_price'];
+                $crop_total['current_total_price']+=$info['current_total_price'];
+                $type_total['current_total_price']+=$info['current_total_price'];
                 $items[]=$this->get_grid_row($info,$report_type);
             }
         }
@@ -359,15 +566,47 @@ class Reports_stock extends Root_Controller
         {
             $row['stock_return']=$info['stock_return'];
         }
-        $row['sales']='';
-        $row['sales_cancel']='';
-        $row['current_stock']=$info['starting_stock']+$info['stock_in']-$info['stock_return'];
+        if($report_type=='weight')
+        {
+            $row['sales']=number_format($info['sales']/1000,3,'.','');
+        }
+        else
+        {
+            $row['sales']=$info['sales'];
+        }
+        if($report_type=='weight')
+        {
+            $row['sales_cancel']=number_format($info['sales_cancel']/1000,3,'.','');
+        }
+        else
+        {
+            $row['sales_cancel']=$info['sales_cancel'];
+        }
+        if($report_type=='weight')
+        {
+            $row['sales_actual']=number_format(($info['sales']-$info['sales_cancel'])/1000,3,'.','');
+        }
+        else
+        {
+            $row['sales_actual']=$info['sales']-$info['sales_cancel'];
+        }
+
+
+        $row['current_stock']=$info['starting_stock']+$info['stock_in']-$info['stock_return']-$info['sales']+$info['sales_cancel'];
         if($report_type=='weight')
         {
             $row['current_stock']=number_format($row['current_stock']/1000,3,'.','');
         }
-        $row['current_unit_price']='';
-        $row['current_total_price']='';
+        if($info['current_unit_price']!='')
+        {
+            $row['current_unit_price']=number_format($info['current_unit_price'],2);
+        }
+        else
+        {
+            $row['current_unit_price']='';
+        }
+
+        $row['current_total_price']=number_format($info['current_total_price'],2);
         return $row;
 
     }

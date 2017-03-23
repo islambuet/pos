@@ -49,6 +49,7 @@ if(sizeof($action_buttons)>0)
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_return">Stock Return</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales">Sales</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales_cancel">Sales cancel</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="sales_actual">Actual sale</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_stock">Current Stock</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_unit_price">Current unit Price</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="current_total_price">Current Stock Price</label>
@@ -84,6 +85,7 @@ if(sizeof($action_buttons)>0)
                 { name: 'stock_return', type: 'string' },
                 { name: 'sales', type: 'string' },
                 { name: 'sales_cancel', type: 'string' },
+                { name: 'sales_actual', type: 'string' },
                 { name: 'current_stock', type: 'string' },
                 { name: 'current_unit_price', type: 'string' },
                 { name: 'current_total_price', type: 'string' }
@@ -174,6 +176,7 @@ if(sizeof($action_buttons)>0)
                     { text: 'Stock Return',hidden:false, dataField: 'stock_return',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Sales', dataField: 'sales',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Sales Cancel',hidden:false, dataField: 'sales_cancel',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
+                    { text: 'Actual Sale',hidden:false, dataField: 'sales_actual',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Current Stock', dataField: 'current_stock',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Current unit Price', dataField: 'current_unit_price',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Current Stock Price', dataField: 'current_total_price',width:'150',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer}
