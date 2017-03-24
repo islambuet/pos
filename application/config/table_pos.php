@@ -15,3 +15,4 @@ $config['table_pos_setup_farmer_outlet'] = 'pos_setup_farmer_outlet';
 
 $config['table_pos_sale'] = 'pos_sale';
 $config['table_pos_sale_details'] = 'pos_sale_details';
+$config['table_pos_setup_stock_min_max'] = 'pos_setup_stock_min_max';
