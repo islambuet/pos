@@ -208,7 +208,7 @@ class Setup_farmer_farmer extends Root_Controller
             }
             $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f');
             $this->db->select('f.*');
-            $this->db->select('ft.name type_name');
+            $this->db->select('ft.name type_name,ft.discount_coupon,ft.discount_non_coupon');
             $this->db->join($this->config->item('table_pos_setup_farmer_type').' ft','ft.id = f.type_id','INNER');
             $this->db->where('f.id',$item_id);
 

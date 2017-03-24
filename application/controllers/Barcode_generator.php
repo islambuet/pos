@@ -8,8 +8,20 @@ class Barcode_generator extends CI_Controller
         parent::__construct();
         $this->message="";
     }
-    public function get_image($text)
+    public function get_image($type,$id)
     {
+        if($type=='farmer')
+        {
+            $text=System_helper::get_farmer_barcode($id);
+        }
+        elseif($type=='invoice')
+        {
+            $text=System_helper::get_invoice_barcode($id);
+        }
+        else
+        {
+            $text=($id);
+        }
         $image_width=150;
         $image_height=30;
         $code_string=$this->get_code39_string($text);

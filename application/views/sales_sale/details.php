@@ -51,7 +51,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <div style="width: 320px;font-size: 10px;text-align: center; font-weight: bold;line-height: 10px;margin-left:-40px;padding-bottom: 15px; background-color: #F7F7F7;">
     <div style="font-size:14px;line-height: 16px;">Malik Seeds</div>
     <div style="font-size:12px;line-height: 14px;"><?php echo $item['outlet_short_name'];?></div>
-    <img src="<?php echo site_url('barcode_generator/get_image/'.(System_helper::get_invoice_barcode($item['id'])));  ?>">
+    <img src="<?php echo site_url('barcode_generator/get_image/invoice/'.$item['id']);  ?>">
     <div style="margin:5px 0;padding: 5px;border-bottom: 2px solid #000000;border-top: 2px solid #000000;text-align: left;">
         <div><?php echo $CI->lang->line('LABEL_DATE');?> :<?php echo System_helper::display_date_time($item['date_sale']);?></div>
         <div><?php echo $CI->lang->line('LABEL_INVOICE_NO');?> :<?php echo System_helper::get_invoice_barcode($item['id']);?></div>
