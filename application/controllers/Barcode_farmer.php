@@ -96,7 +96,7 @@ class Barcode_farmer extends Root_Controller
 
             $this->db->from($this->config->item('table_pos_setup_farmer_outlet').' fo');
             $this->db->select('CONCAT(cus.customer_code," - ",cus.name) text');
-            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id = fo.farmer_id','INNER');
+            $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id = fo.customer_id','INNER');
             $this->db->where('fo.revision',1);
             $this->db->where('fo.farmer_id',$item_id);
             $data['assigned_outlets']=$this->db->get()->result_array();
