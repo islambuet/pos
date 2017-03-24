@@ -39,6 +39,10 @@ class Reports_sale extends Root_Controller
         {
             $this->system_list();
         }
+        elseif($action=='get_items_outlet_invoice')
+        {
+            $this->system_get_items_outlet_invoice();
+        }
         elseif($action=="details_invoice")
         {
             $this->system_details_invoice($id);
@@ -134,7 +138,7 @@ class Reports_sale extends Root_Controller
         }
 
     }
-    public function get_items_outlet_invoice()
+    private function system_get_items_outlet_invoice()
     {
 
         $customer_ids=$this->input->post('customer_ids');

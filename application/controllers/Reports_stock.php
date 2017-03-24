@@ -39,6 +39,10 @@ class Reports_stock extends Root_Controller
         {
             $this->system_list();
         }
+        elseif($action=='get_items')
+        {
+            $this->system_get_items();
+        }
         else
         {
             $this->system_search();
@@ -114,7 +118,7 @@ class Reports_stock extends Root_Controller
         }
 
     }
-    public function get_items()
+    private function system_get_items()
     {
         $report_type=$this->input->post('report_type');
         $customer_id=$this->input->post('customer_id');
