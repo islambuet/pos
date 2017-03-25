@@ -320,7 +320,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </div>
             <div style="" class="row show-grid">
                 <div class="col-xs-4">
-                    <label class="control-label pull-right">Reason</label>
+                    <label class="control-label pull-right">Cancel Reason</label>
                 </div>
                 <div class="col-sm-4 col-xs-8">
                     <label class="control-label"><?php echo $item['remarks'];?></label>
@@ -339,6 +339,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 </div>
                 <div class="col-sm-4 col-xs-8">
                     <label class="control-label"><?php echo System_helper::get_invoice_barcode($item['invoice_old_id']);?></label>
+                </div>
+            </div>
+            <div style="" class="row show-grid">
+                <div class="col-xs-4">
+                    <label class="control-label pull-right">Re-Invoice Reason</label>
+                </div>
+                <div class="col-sm-4 col-xs-8">
+                    <label class="control-label"><?php echo $item['remarks'];?></label>
                 </div>
             </div>
         <?php
