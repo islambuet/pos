@@ -45,9 +45,9 @@ if(sizeof($action_buttons)>0)
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="variety_name"><?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="pack_size"><?php echo $CI->lang->line('LABEL_PACK_NAME'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="starting_stock">Starting Stock</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_current">Current Stock</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_min">Minimum Stock</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_max">Maximum Stock</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_current">Current Stock</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_dif_min">Difference with Minimum Stock</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column"  checked value="stock_dif_max">Difference with Maximum Stock</label>
         </div>
@@ -146,9 +146,9 @@ if(sizeof($action_buttons)>0)
                     { text: '<?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?>', dataField: 'type_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer},
                     { text: '<?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?>', dataField: 'variety_name',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer},
                     { text: 'Pack Size(gm)', dataField: 'pack_size',cellsalign: 'right',width: '100',cellsrenderer: cellsrenderer,pinned:true,rendered: tooltiprenderer},
-                    { text: 'Current Stock', dataField: 'stock_current',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer},
                     { text: 'minimum stock', dataField: 'stock_min',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer},
                     { text: 'maximum stock', dataField: 'stock_max',width:'150',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer},
+                    { text: 'Current Stock', dataField: 'stock_current',width:'100',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer},
                     { text: 'Diff with Min', dataField: 'stock_dif_min',width:'150',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer},
                     { text: 'Diff with Max', dataField: 'stock_dif_max',width:'150',cellsalign: 'right',cellsrenderer: cellsrenderer,rendered: tooltiprenderer}
                 ]
