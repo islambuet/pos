@@ -77,7 +77,7 @@
             <div class="col-xs-6">
                 <div class="row show-grid">
                     <div class="col-xs-6">
-                        <input type="text" name="report[date_start]" class="form-control date_large" value="<?php echo $date_start; ?>">
+                        <input type="text" name="report[date_start]" class="form-control date_large" value="<?php echo System_helper::display_date(time()); ?>">
                     </div>
                     <div class="col-xs-6">
                         <label class="control-label"><?php echo $this->lang->line('LABEL_DATE_START');?></label>
@@ -85,7 +85,7 @@
                 </div>
                 <div class="row show-grid">
                     <div class="col-xs-6">
-                        <input type="text" name="report[date_end]" class="form-control date_large" value="<?php echo $date_end; ?>">
+                        <input type="text" name="report[date_end]" class="form-control date_large" value="<?php echo System_helper::display_date(time()); ?>">
                     </div>
                     <div class="col-xs-6">
                         <label class="control-label"><?php echo $this->lang->line('LABEL_DATE_END');?></label>

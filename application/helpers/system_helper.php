@@ -106,7 +106,7 @@ class System_helper
         }
         else if(($barcode_type=='any')||($barcode_type=='mobile_no'))
         {
-            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('mobile_no ='.intval($barcode)),1);
+            $result=Query_helper::get_info($CI->config->item('table_pos_setup_farmer_farmer'),'*',array('mobile_no ="'.($barcode).'"'),1);
         }
         return $result;
 

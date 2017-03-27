@@ -55,8 +55,6 @@ class Reports_stock extends Root_Controller
             $data['title']="Stock Report Search";
             $ajax['status']=true;
             $data['outlets']=$this->user_outlets;
-            $data['date_start']='';
-            $data['date_end']=System_helper::display_date(time());
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/search",$data,true));
             if($this->message)
             {
