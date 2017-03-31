@@ -137,6 +137,11 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 $('#'+'weight_'+variety_barcode).html(number_format(cur_quantity*varieties_info[variety_barcode]['pack_size']/1000,3,'.',''));
                 $('#'+'price_'+variety_barcode).html(number_format(cur_quantity*varieties_info[variety_barcode]['price'],2));
             }
+
+            else if(stock_info[variety_barcode]===undefined)
+            {
+                animate_message("Product is not available in this outlet.");
+            }
             else
             {
                 var content_id='#system_content_add_more table tbody';
@@ -150,14 +155,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 $(content_id+' .pack_size_price').html(number_format(varieties_info[variety_barcode]['price'],2));
                 $(content_id+' .pack_size_price').attr('id','pack_size_price_'+variety_barcode);
                 $(content_id+' .current_stock').attr('id','current_stock_'+variety_barcode);
-                if(stock_info[variety_barcode]===undefined)
-                {
-                    $(content_id+' .current_stock').html(0);
-                }
-                else
-                {
-                    $(content_id+' .current_stock').html(stock_info[variety_barcode]);
-                }
+                $(content_id+' .current_stock').html(stock_info[variety_barcode]);
 
                 $(content_id+' .quantity').attr('id','quantity_'+variety_barcode);
                 $(content_id+' .quantity').attr('name','varieties['+varieties_info[variety_barcode]['variety_id']+']['+varieties_info[variety_barcode]['pack_id']+'][quantity]');
