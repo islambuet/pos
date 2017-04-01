@@ -62,7 +62,7 @@ class Barcode_variety extends Root_Controller
     private function system_get_items()
     {
         $this->db->from($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_variety_price').' vp');
-        $this->db->select('vp.id');
+        $this->db->select('vp.id,vp.price');
         $this->db->select('v.id variety_id,v.name variety_name');
         $this->db->select('crop.name crop_name,crop.id crop_id');
         $this->db->select('type.name crop_type_name,type.id type_id');

@@ -24,6 +24,24 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         </div>
         <div class="clearfix"></div>
     </div>
+    <?php
+    if(isset($CI->permissions['action6']) && ($CI->permissions['action6']==1))
+    {
+        ?>
+        <div class="col-xs-12" style="margin-bottom: 20px;">
+            <div class="col-xs-12" style="margin-bottom: 20px;">
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="crop_name"><?php echo $CI->lang->line('LABEL_CROP_NAME'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="crop_type_name"><?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="variety_name"><?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="pack_size_name"><?php echo $CI->lang->line('LABEL_PACK_NAME');?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="price"><?php echo $CI->lang->line('LABEL_PRICE');?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="bar_code"><?php echo $CI->lang->line('LABEL_BAR_CODE');?></label>
+
+            </div>
+        </div>
+    <?php
+    }
+    ?>
     <div class="col-xs-12" id="system_jqx_container">
 
     </div>
@@ -44,6 +62,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'crop_type_name', type: 'string' },
                 { name: 'variety_name', type: 'string' },
                 { name: 'pack_size_name', type: 'string' },
+                { name: 'price', type: 'string' },
                 { name: 'bar_code', type: 'string' }
             ],
             id: 'id',
@@ -73,6 +92,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_CROP_TYPE'); ?>', dataField: 'crop_type_name'},
                     { text: '<?php echo $CI->lang->line('LABEL_VARIETY_NAME'); ?>', dataField: 'variety_name'},
                     { text: '<?php echo $CI->lang->line('LABEL_PACK_NAME'); ?>', dataField: 'pack_size_name',cellsalign: 'right'},
+                    { text: '<?php echo $CI->lang->line('LABEL_PRICE'); ?>', dataField: 'price',cellsalign: 'right'},
                     { text: '<?php echo $CI->lang->line('LABEL_BAR_CODE'); ?>', dataField: 'bar_code',cellsalign: 'right'}
                 ]
             });
