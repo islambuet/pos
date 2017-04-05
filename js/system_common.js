@@ -424,6 +424,18 @@ $(document).ready(function()
     $("#popup_window").jqxWindow({
         width: 550,height:550, resizable: true,  isModal: true, autoOpen: false, modalOpacity: 0.01,position: { x: 60, y: 60 }
     });
+    $(document).on("change",".system_check_all",function()
+    {
+        if($(this).is(':checked'))
+        {
+            $($(this).attr('data-checkable')).prop('checked', true);
+        }
+        else
+        {
+            $($(this).attr('data-checkable')).prop('checked', false);
+
+        }
+    });
     //load the current page content
     load_current_content();
 

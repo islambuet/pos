@@ -17,7 +17,7 @@
             <select id="report_name" class="form-control">
                 <option value="outlet_invoice">Outlet Invoice Wise</option>
 <!--                <option value="outlet_variety">Outlet Product wise</option>-->
-                <!--                <option value="customer_invoice">Customer Invoice wise</option>-->
+                <option value="farmer_invoice">Farmer Invoice wise</option>
                 <!--                <option value="customer_variety">Customer variety wise</option>-->
                 <!--                <option value="variety_customer">Variety Customer wise</option>-->
             </select>
@@ -81,6 +81,5 @@
                 });
             $("#popup_window").jqxWindow('open');
         });
-
     });
 </script>

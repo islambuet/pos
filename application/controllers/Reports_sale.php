@@ -43,9 +43,17 @@ class Reports_sale extends Root_Controller
         {
             $this->system_get_items_outlet_invoice();
         }
+        elseif($action=='get_items_farmer_invoice')
+        {
+            $this->system_get_items_farmer_invoice();
+        }
         elseif($action=="details_invoice")
         {
             $this->system_details_invoice($id);
+        }
+        elseif($action=='search_farmer')
+        {
+            $this->system_search_farmer();
         }
         else
         {
@@ -59,9 +67,15 @@ class Reports_sale extends Root_Controller
             $data['title']="Sale Report Search";
             $ajax['status']=true;
             $report_name=$this->input->post('report_name');
+            $data['report_name']=$report_name;
             if($report_name=='outlet_invoice')
             {
                 $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_outlet_invoice",$data,true));
+            }
+            elseif($report_name=='farmer_invoice')
+            {
+                $data['farmer_types']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC','id ASC'));
+                $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_farmer",$data,true));
             }
             else
             {
@@ -83,9 +97,55 @@ class Reports_sale extends Root_Controller
             $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
             $this->json_return($ajax);
         }
+    }
+    private function system_search_farmer()
+    {
+        $data['title']="Select Farmers";
+        $ajax['status']=true;
+        $report_name=$this->input->post('report_name');
+        $data['report_name']=$report_name;
+        if($report_name=='farmer_invoice')
+        {
+            $customer_ids=$this->input->post('customer_ids');
+            $farmer_types=$this->input->post('farmer_types');
+            if(sizeof($customer_ids)<1)
+            {
+                $ajax['status']=false;
+                $ajax['system_message']='Please Select at least one outlet';
+                $this->json_return($ajax);
+                die();
+            }
+            if(sizeof($farmer_types)<1)
+            {
+                $ajax['status']=false;
+                $ajax['system_message']='Please Select at least one Farmer Type';
+                $this->json_return($ajax);
+                die();
+            }
+            $this->db->from($this->config->item('table_pos_setup_farmer_outlet').' fo');
+            $this->db->select('f.id,f.name');
+            $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = fo.farmer_id','INNER');
+            $this->db->where_in('fo.customer_id',$customer_ids);
+            $this->db->where_in('f.type_id',$farmer_types);
+            $this->db->group_by('f.id');
+            $this->db->order_by('f.ordering DESC');
+            $this->db->order_by('f.id DESC');
+            $data['farmers']=$this->db->get()->result_array();
+            $ajax['system_content'][]=array("id"=>"#system_farmer_form_container","html"=>$this->load->view($this->controller_url."/search_customer_invoice",$data,true));
+        }
+        else
+        {
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/search",$data,true));
+            $ajax['system_page_url']=site_url($this->controller_url);
+        }
+        if($this->message)
+        {
+            $ajax['system_message']=$this->message;
+        }
+
+        $this->json_return($ajax);
 
     }
-
     private function system_list()
     {
 
@@ -117,6 +177,18 @@ class Reports_sale extends Root_Controller
                 }
                 $data['title']="Invoice Wise Sales Report";
                 $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_outlet_invoice",$data,true));
+            }
+            elseif($report_name=='farmer_invoice')
+            {
+                if(!isset($reports['farmers']))
+                {
+                    $ajax['status']=false;
+                    $ajax['system_message']='Please Select at least one Farmer';
+                    $this->json_return($ajax);
+                    die();
+                }
+                $data['title']="Farmer Invoice Wise Sales Report";
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_farmer_invoice",$data,true));
             }
             else
             {
@@ -188,7 +260,7 @@ class Reports_sale extends Root_Controller
             {
                 if($prev_outlet_name!=$result['outlet_name'])
                 {
-                    $items[]=$this->get_grid_row($outlet_total);
+                    $items[]=$this->get_outlet_invoice_row($outlet_total);
                     $outlet_total['amount_actual']=0;
                     $prev_outlet_name=$result['outlet_name'];
                 }
@@ -212,6 +284,10 @@ class Reports_sale extends Root_Controller
                 {
                     $result['amount_actual']=0-$result['amount_payable'];
                 }
+                elseif($result['date_canceled']>$date_end)
+                {
+                    $result['amount_actual']=$result['amount_payable'];
+                }
                 else
                 {
                     $result['amount_actual']=0;
@@ -220,15 +296,15 @@ class Reports_sale extends Root_Controller
             }
             $outlet_total['amount_actual']+=$result['amount_actual'];
             $grand_total['amount_actual']+=$result['amount_actual'];
-            $items[]=$this->get_grid_row($result);
+            $items[]=$this->get_outlet_invoice_row($result);
         }
-        $items[]=$this->get_grid_row($outlet_total);
-        $items[]=$this->get_grid_row($grand_total);
+        $items[]=$this->get_outlet_invoice_row($outlet_total);
+        $items[]=$this->get_outlet_invoice_row($grand_total);
         $this->json_return($items);
 
 
     }
-    private function get_grid_row($info)
+    private function get_outlet_invoice_row($info)
     {
         $row=array();
         $row['id']=$info['id'];
@@ -404,5 +480,186 @@ class Reports_sale extends Root_Controller
             $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
             $this->json_return($ajax);
         }
+    }
+    private function system_get_items_farmer_invoice()
+    {
+
+        $farmer_ids=$this->input->post('farmers');
+        $date_end=$this->input->post('date_end');
+        $date_start=$this->input->post('date_start');
+
+
+        $this->db->from($this->config->item('table_pos_sale').' sale');
+        $this->db->select('sale.*');
+        $this->db->select('f.name farmer_name');
+        $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+        $this->db->where_in('sale.farmer_id',$farmer_ids);
+        $where='(sale.date_sale >='.$date_start.' AND sale.date_sale <='.$date_end.')';
+        $where.=' OR (sale.date_canceled >='.$date_start.' AND sale.date_canceled <='.$date_end.')';
+
+        $this->db->where('('.$where.')');
+        $this->db->order_by('f.ordering DESC');
+        $this->db->order_by('f.id ASC');
+        $this->db->order_by('sale.date_sale DESC');
+
+        $results=$this->db->get()->result_array();
+        $farmer_total=array();
+        $grand_total=array();
+        $grand_total['id']=$farmer_total['id']=0;
+        $grand_total['date_sale']='Grand Total';
+        $farmer_total['date_sale']='Farmer Total';
+        $grand_total['date_canceled']=$farmer_total['date_canceled']=0;
+        $grand_total['invoice_no']=$farmer_total['invoice_no']=0;
+        $grand_total['farmer_name']=$farmer_total['farmer_name']='';
+        $grand_total['amount_total']=$farmer_total['amount_total']=0;
+        $grand_total['amount_discount']=$farmer_total['amount_discount']=0;
+        $grand_total['amount_payable']=$farmer_total['amount_payable']=0;
+        $grand_total['amount_actual']=$farmer_total['amount_actual']=0;
+        $grand_total['invoice_old_id']=$farmer_total['invoice_old_id']=0;
+        $grand_total['invoice_new_id']=$farmer_total['invoice_new_id']=0;
+        $grand_total['remarks']=$farmer_total['remarks']='';
+        $grand_total['status']=$farmer_total['status']='Active';
+        $items=array();
+        $prev_farmer_name='';
+        $first_row=true;
+        foreach($results as $result)
+        {
+            if(!$first_row)
+            {
+                if($prev_farmer_name!=$result['farmer_name'])
+                {
+                    $items[]=$this->get_farmer_invoice_row($farmer_total);
+                    $farmer_total['amount_actual']=0;
+                    $prev_farmer_name=$result['farmer_name'];
+                }
+                else
+                {
+                    $result['farmer_name']='';
+                }
+            }
+            else
+            {
+                $prev_farmer_name=$result['farmer_name'];
+                $first_row=false;
+            }
+            if($result['status']==$this->config->item('system_status_active'))
+            {
+                $result['amount_actual']=$result['amount_payable'];
+            }
+            else
+            {
+                if($result['date_sale']<$date_start)
+                {
+                    $result['amount_actual']=0-$result['amount_payable'];
+                }
+                elseif($result['date_canceled']>$date_end)
+                {
+                    $result['amount_actual']=$result['amount_payable'];
+                }
+                else
+                {
+                    $result['amount_actual']=0;
+                }
+
+            }
+            $farmer_total['amount_actual']+=$result['amount_actual'];
+            $grand_total['amount_actual']+=$result['amount_actual'];
+            $items[]=$this->get_farmer_invoice_row($result);
+        }
+        $items[]=$this->get_farmer_invoice_row($farmer_total);
+        $items[]=$this->get_farmer_invoice_row($grand_total);
+        $this->json_return($items);
+
+
+    }
+    private function get_farmer_invoice_row($info)
+    {
+        $row=array();
+        $row['id']=$info['id'];
+        $row['farmer_name']=$info['farmer_name'];
+        if($info['date_sale']>0)
+        {
+            $row['date_sale']=System_helper::display_date_time($info['date_sale']);
+        }
+        else
+        {
+            $row['date_sale']=$info['date_sale'];
+        }
+        if($info['date_canceled']>0)
+        {
+            $row['date_canceled']=System_helper::display_date_time($info['date_canceled']);
+        }
+        else
+        {
+            $row['date_canceled']='';
+        }
+        if($info['id']>0)
+        {
+            $row['invoice_no']=System_helper::get_invoice_barcode($info['id']);
+        }
+        else
+        {
+            $row['invoice_no']='';
+        }
+        if($info['amount_total']>0)
+        {
+            $row['amount_total']=number_format($info['amount_total'],2);
+        }
+        else
+        {
+            $row['amount_total']='';
+        }
+        if(($info['amount_total']-$info['amount_payable'])>0)
+        {
+            $row['amount_discount']=number_format($info['amount_total']-$info['amount_payable'],2);
+        }
+        else
+        {
+            $row['amount_discount']='';
+        }
+        if($info['amount_payable']>0)
+        {
+            $row['amount_payable']=number_format($info['amount_payable'],2);
+        }
+        else
+        {
+            $row['amount_payable']='';
+        }
+        if($info['amount_actual']!=0)
+        {
+            $row['amount_actual']=number_format($info['amount_actual'],2);
+        }
+        else
+        {
+            $row['amount_actual']='';
+        }
+        if($info['invoice_old_id']>0)
+        {
+            $row['invoice_old_id']=System_helper::get_invoice_barcode($info['invoice_old_id']);
+        }
+        else
+        {
+            $row['invoice_old_id']='';
+        }
+        if($info['invoice_new_id']>0)
+        {
+            $row['invoice_new_id']=System_helper::get_invoice_barcode($info['invoice_new_id']);
+        }
+        else
+        {
+            $row['invoice_new_id']='';
+        }
+        $row['remarks']=$info['remarks'];
+        $row['status']=$info['status'];
+        if($info['id']>0)
+        {
+            $row['details_button']=true;
+        }
+        else
+        {
+            $row['details_button']=false;
+        }
+        return $row;
+
     }
 }
