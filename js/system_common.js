@@ -314,7 +314,7 @@ $(document).ready(function()
         var url=jqx_source['_source']['url'];
         var data=jqx_source['_source']['data'];
         var type=jqx_source['_source']['type'];
-        var total_records = $(jqx_grid_id).jqxGrid('getrows').length;
+        var total_records = $(jqx_grid_id).jqxGrid('getboundrows').length;
         if(data!==undefined)
         {
             data['total_records']=total_records;
