@@ -30,7 +30,7 @@ $CI = & get_instance();
                         {
                             ?>
                             <label class="control-label"><?php echo $CI->user_outlets[0]['name'];?></label>
-                            <input type="hidden" name="report[customer_id]" value="<?php echo $CI->user_outlets[0]['id'];?>">
+                            <input id="customer_id" type="hidden" name="report[customer_id]" value="<?php echo $CI->user_outlets[0]['id'];?>">
                             <?php
                         }
                         ?>
