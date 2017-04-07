@@ -40,19 +40,10 @@ if(sizeof($action_buttons)>0)
 
         ?>
         <div class="col-xs-12" style="margin-bottom: 20px;">
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="farmer_name"><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="invoice_no"><?php echo $CI->lang->line('LABEL_INVOICE_NO'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="date_sale">Sale <?php echo $CI->lang->line('LABEL_DATE'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="date_canceled">Cancel <?php echo $CI->lang->line('LABEL_DATE'); ?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_total"><?php echo $CI->lang->line('LABEL_TOTAL');?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_discount"><?php echo $CI->lang->line('LABEL_DISCOUNT');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="farmer_name"><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_payable"><?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_cancel"><?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE');?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_actual">Actual amount</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="invoice_old_id">Old Invoice No</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="invoice_new_id">New Invoice No</label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="remarks"><?php echo $CI->lang->line('LABEL_REMARKS');?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button"><?php echo $CI->lang->line('ACTION_DETAILS');?></label>
-
         </div>
     <?php
     }
@@ -68,7 +59,7 @@ if(sizeof($action_buttons)>0)
         //var grand_total_color='#AEC2DD';
         var grand_total_color='#AEC2DD';
 
-        var url = "<?php echo base_url($CI->controller_url.'/index/get_items_farmer_invoice');?>";
+        var url = "<?php echo base_url($CI->controller_url.'/index/get_items_farmers_sale');?>";
 
         // prepare the data
         var source =
@@ -77,18 +68,9 @@ if(sizeof($action_buttons)>0)
             dataFields: [
                 { name: 'id', type: 'int' },
                 { name: 'farmer_name', type: 'string' },
-                { name: 'invoice_no', type: 'string' },
-                { name: 'date_sale', type: 'string' },
-                { name: 'date_canceled', type: 'string' },
-                { name: 'amount_total', type: 'string' },
-                { name: 'amount_discount', type: 'string' },
                 { name: 'amount_payable', type: 'string' },
-                { name: 'amount_actual', type: 'string' },
-                { name: 'invoice_old_id', type: 'string' },
-                { name: 'invoice_new_id', type: 'string' },
-                { name: 'remarks', type: 'string' },
-                { name: 'details_button', type: 'string' },
-                { name: 'status', type: 'string' }
+                { name: 'amount_cancel', type: 'string' },
+                { name: 'amount_actual', type: 'string' }
             ],
             url: url,
             type: 'POST',
@@ -102,7 +84,7 @@ if(sizeof($action_buttons)>0)
             {
                 element.css({ 'background-color': '#FF0000','margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
             }
-            else if (record.date_sale=="Grand Total")
+            else if (record.farmer_name=="Grand Total")
             {
 
                 element.css({ 'background-color': grand_total_color,'margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
@@ -131,7 +113,7 @@ if(sizeof($action_buttons)>0)
         };
         var aggregates=function (total, column, element, record)
         {
-            if(record.date_sale=="Grand Total")
+            if(record.farmer_name=="Grand Total")
             {
                 //console.log(element);
                 return record[element];
@@ -161,18 +143,11 @@ if(sizeof($action_buttons)>0)
                 showstatusbar: true,
                 rowsheight: 40,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_CUSTOMER_NAME'); ?>',hidden:true, dataField: 'farmer_name',width:'200',cellsrenderer: cellsrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_INVOICE_NO'); ?>', dataField: 'invoice_no',width:'100',cellsrenderer: cellsrenderer},
-                    { text: 'Sale <?php echo $CI->lang->line('LABEL_DATE'); ?>', dataField: 'date_sale',width:'200',cellsrenderer: cellsrenderer},
-                    { text: 'Cancel <?php echo $CI->lang->line('LABEL_DATE'); ?>',hidden:true, dataField: 'date_canceled',width:'200',cellsrenderer: cellsrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_TOTAL'); ?>', dataField: 'amount_total',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_DISCOUNT'); ?>', dataField: 'amount_discount',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_CUSTOMER_NAME'); ?>', dataField: 'farmer_name',width:'200',cellsrenderer: cellsrenderer},
                     { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE'); ?>', dataField: 'amount_payable',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
-                    { text: 'Actual amount', dataField: 'amount_actual',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
-                    { text: 'Old Invoice no',hidden:true, dataField: 'invoice_old_id',width:'100',cellsrenderer: cellsrenderer},
-                    { text: 'New Invoice no',hidden:true, dataField: 'invoice_new_id',width:'100',cellsrenderer: cellsrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_REMARKS'); ?>',hidden:true, dataField: 'remarks',width:'200',cellsrenderer: cellsrenderer},
-                    { text: '<?php echo $CI->lang->line('ACTION_DETAILS'); ?>',dataField: 'details_button',width:'250',cellsrenderer:cellsrenderer}
+                    { text: 'Sales Cancel', dataField: 'amount_cancel',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
+                    { text: 'Actual amount', dataField: 'amount_actual',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer}
+
                 ]
             });
     });

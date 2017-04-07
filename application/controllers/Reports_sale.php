@@ -43,6 +43,10 @@ class Reports_sale extends Root_Controller
         {
             $this->system_get_items_outlet_invoice();
         }
+        elseif($action=='get_items_farmers_sale')
+        {
+            $this->system_get_items_farmers_sale();
+        }
         elseif($action=='get_items_farmer_invoice')
         {
             $this->system_get_items_farmer_invoice();
@@ -50,10 +54,6 @@ class Reports_sale extends Root_Controller
         elseif($action=="details_invoice")
         {
             $this->system_details_invoice($id);
-        }
-        elseif($action=='search_farmer')
-        {
-            $this->system_search_farmer();
         }
         else
         {
@@ -72,10 +72,10 @@ class Reports_sale extends Root_Controller
             {
                 $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_outlet_invoice",$data,true));
             }
-            elseif($report_name=='farmer_invoice')
+            elseif($report_name=='farmer_sale')
             {
                 $data['farmer_types']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC','id ASC'));
-                $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_farmer",$data,true));
+                $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_farmer_sale",$data,true));
             }
             else
             {
@@ -98,57 +98,8 @@ class Reports_sale extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    private function system_search_farmer()
-    {
-        $data['title']="Select Farmers";
-        $ajax['status']=true;
-        $report_name=$this->input->post('report_name');
-        $data['report_name']=$report_name;
-        if($report_name=='farmer_invoice')
-        {
-            $customer_ids=$this->input->post('customer_ids');
-            $farmer_types=$this->input->post('farmer_types');
-            if(sizeof($customer_ids)<1)
-            {
-                $ajax['status']=false;
-                $ajax['system_message']='Please Select at least one outlet';
-                $this->json_return($ajax);
-                die();
-            }
-            if(sizeof($farmer_types)<1)
-            {
-                $ajax['status']=false;
-                $ajax['system_message']='Please Select at least one Farmer Type';
-                $this->json_return($ajax);
-                die();
-            }
-            $this->db->from($this->config->item('table_pos_setup_farmer_outlet').' fo');
-            $this->db->select('f.id,f.name');
-            $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = fo.farmer_id','INNER');
-            $this->db->where_in('fo.customer_id',$customer_ids);
-            $this->db->where_in('f.type_id',$farmer_types);
-            $this->db->group_by('f.id');
-            $this->db->order_by('f.ordering DESC');
-            $this->db->order_by('f.id DESC');
-            $data['farmers']=$this->db->get()->result_array();
-            $ajax['system_content'][]=array("id"=>"#system_farmer_form_container","html"=>$this->load->view($this->controller_url."/search_customer_invoice",$data,true));
-        }
-        else
-        {
-            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/search",$data,true));
-            $ajax['system_page_url']=site_url($this->controller_url);
-        }
-        if($this->message)
-        {
-            $ajax['system_message']=$this->message;
-        }
-
-        $this->json_return($ajax);
-
-    }
     private function system_list()
     {
-
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
             $report_name=$this->input->post('report_name');
@@ -178,17 +129,19 @@ class Reports_sale extends Root_Controller
                 $data['title']="Invoice Wise Sales Report";
                 $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_outlet_invoice",$data,true));
             }
-            elseif($report_name=='farmer_invoice')
+            elseif($report_name=='farmer_sale')
             {
-                if(!isset($reports['farmers']))
+                if($reports['farmer_id']>0)
                 {
-                    $ajax['status']=false;
-                    $ajax['system_message']='Please Select at least one Farmer';
-                    $this->json_return($ajax);
-                    die();
+                    $data['title']="Farmer's Invoice Report";
+                    $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_farmer_invoice",$data,true));
                 }
-                $data['title']="Farmer Invoice Wise Sales Report";
-                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_farmer_invoice",$data,true));
+                else
+                {
+                    $data['title']="Farmers Sales Report";
+                    $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_farmers_sale",$data,true));
+                }
+
             }
             else
             {
@@ -484,7 +437,7 @@ class Reports_sale extends Root_Controller
     private function system_get_items_farmer_invoice()
     {
 
-        $farmer_ids=$this->input->post('farmers');
+        $farmer_id=$this->input->post('farmer_id');
         $date_end=$this->input->post('date_end');
         $date_start=$this->input->post('date_start');
 
@@ -493,7 +446,7 @@ class Reports_sale extends Root_Controller
         $this->db->select('sale.*');
         $this->db->select('f.name farmer_name');
         $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
-        $this->db->where_in('sale.farmer_id',$farmer_ids);
+        $this->db->where('sale.farmer_id',$farmer_id);
         $where='(sale.date_sale >='.$date_start.' AND sale.date_sale <='.$date_end.')';
         $where.=' OR (sale.date_canceled >='.$date_start.' AND sale.date_canceled <='.$date_end.')';
 
@@ -566,7 +519,6 @@ class Reports_sale extends Root_Controller
             $grand_total['amount_actual']+=$result['amount_actual'];
             $items[]=$this->get_farmer_invoice_row($result);
         }
-        $items[]=$this->get_farmer_invoice_row($farmer_total);
         $items[]=$this->get_farmer_invoice_row($grand_total);
         $this->json_return($items);
 
@@ -658,6 +610,131 @@ class Reports_sale extends Root_Controller
         else
         {
             $row['details_button']=false;
+        }
+        return $row;
+
+    }
+    private function system_get_items_farmers_sale()
+    {
+
+        $customer_id=$this->input->post('customer_id');
+        $farmer_type=$this->input->post('farmer_type');
+        $date_end=$this->input->post('date_end');
+        $date_start=$this->input->post('date_start');
+
+        //total sales
+        $this->db->from($this->config->item('table_pos_sale').' sale');
+        $this->db->select('sale.farmer_id');
+        $this->db->select('SUM(sale.amount_payable) amount_payable');
+
+
+        $this->db->where('sale.customer_id',$customer_id);
+        if($farmer_type>0)
+        {
+            $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+            $this->db->where('f.type_id',$farmer_type);
+        }
+        $this->db->where('sale.date_sale >=',$date_start);
+        $this->db->where('sale.date_sale <=',$date_end);
+        $this->db->group_by('sale.farmer_id');
+        $results=$this->db->get()->result_array();
+        $sale_info=array();
+        $farmer_ids=array();
+        foreach($results as $result)
+        {
+            $sale_info[$result['farmer_id']]=$result;
+            $sale_info[$result['farmer_id']]['amount_cancel']=0;
+            $farmer_ids[$result['farmer_id']]=$result['farmer_id'];
+        }
+        //total cancel
+        $this->db->from($this->config->item('table_pos_sale').' sale');
+        $this->db->select('sale.farmer_id');
+        $this->db->select('SUM(sale.amount_payable) amount_cancel');
+
+
+        $this->db->where('sale.customer_id',$customer_id);
+        $this->db->where('sale.status',$this->config->item('system_status_inactive'));
+        if($farmer_type>0)
+        {
+            $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+            $this->db->where('f.type_id',$farmer_type);
+        }
+        $this->db->where('sale.date_canceled >=',$date_start);
+        $this->db->where('sale.date_canceled <=',$date_end);
+        $this->db->group_by('sale.farmer_id');
+        $results=$this->db->get()->result_array();
+        foreach($results as $result)
+        {
+            if(isset($sale_info[$result['farmer_id']]))
+            {
+                $sale_info[$result['farmer_id']]['amount_cancel']=$result['amount_cancel'];
+            }
+            else
+            {
+                $sale_info[$result['farmer_id']]=$result;
+                $sale_info[$result['farmer_id']]['amount_payable']=0;
+            }
+            $farmer_ids[$result['farmer_id']]=$result['farmer_id'];
+        }
+        $items=array();
+        $grand_total=array();
+        $grand_total['farmer_id']=0;
+        $grand_total['farmer_name']='Grand Total';
+        $grand_total['amount_payable']=0;
+        $grand_total['amount_cancel']=0;
+        if(sizeof($farmer_ids)>0)
+        {
+            //farmer info
+            $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+            $this->db->select('f.id,f.name farmer_name');
+            $this->db->where_in('f.id',$farmer_ids);
+            $this->db->order_by('f.ordering DESC');
+            $this->db->order_by('f.id ASC');
+            $results=$this->db->get()->result_array();
+
+
+            foreach($results as $result)
+            {
+                $info=$sale_info[$result['id']];
+                $info['farmer_name']=$result['farmer_name'];
+                $grand_total['amount_payable']+=$info['amount_payable'];
+                $grand_total['amount_cancel']+=$info['amount_cancel'];
+                $items[]=$this->get_farmer_sale_row($info);
+            }
+
+        }
+        $items[]=$this->get_farmer_sale_row($grand_total);
+        $this->json_return($items);
+    }
+    private function get_farmer_sale_row($info)
+    {
+        $row=array();
+        $row['id']=$info['farmer_id'];
+        $row['farmer_name']=$info['farmer_name'];
+
+        if($info['amount_payable']>0)
+        {
+            $row['amount_payable']=number_format($info['amount_payable'],2);
+        }
+        else
+        {
+            $row['amount_payable']='';
+        }
+        if($info['amount_cancel']>0)
+        {
+            $row['amount_cancel']=number_format($info['amount_cancel'],2);
+        }
+        else
+        {
+            $row['amount_cancel']='';
+        }
+        if(($info['amount_payable']-$info['amount_cancel'])!=0)
+        {
+            $row['amount_actual']=number_format(($info['amount_payable']-$info['amount_cancel']),2);
+        }
+        else
+        {
+            $row['amount_actual']='';
         }
         return $row;
 
