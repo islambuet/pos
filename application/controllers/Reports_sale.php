@@ -227,19 +227,40 @@ class Reports_sale extends Root_Controller
                 $prev_outlet_name=$result['outlet_name'];
                 $first_row=false;
             }
+            $result['amount_discount']=$result['amount_total']-$result['amount_payable'];
             if($result['status']==$this->config->item('system_status_active'))
             {
                 $result['amount_actual']=$result['amount_payable'];
+                $outlet_total['amount_total']+=$result['amount_total'];
+                $grand_total['amount_total']+=$result['amount_total'];
+
+                $outlet_total['amount_discount']+=$result['amount_discount'];
+                $grand_total['amount_discount']+=$result['amount_discount'];
+
+
             }
             else
             {
                 if($result['date_sale']<$date_start)
                 {
                     $result['amount_actual']=0-$result['amount_payable'];
+
+                    $outlet_total['amount_total']-=$result['amount_total'];
+                    $grand_total['amount_total']-=$result['amount_total'];
+
+                    $outlet_total['amount_discount']-=$result['amount_discount'];
+                    $grand_total['amount_discount']-=$result['amount_discount'];
                 }
                 elseif($result['date_canceled']>$date_end)
                 {
                     $result['amount_actual']=$result['amount_payable'];
+
+                    $outlet_total['amount_total']+=$result['amount_total'];
+                    $grand_total['amount_total']+=$result['amount_total'];
+
+                    $outlet_total['amount_discount']+=$result['amount_discount'];
+                    $grand_total['amount_discount']+=$result['amount_discount'];
+
                 }
                 else
                 {
@@ -295,14 +316,22 @@ class Reports_sale extends Root_Controller
         {
             $row['amount_total']='';
         }
-        if(($info['amount_total']-$info['amount_payable'])>0)
+        if($info['amount_discount']>0)
+        {
+            $row['amount_discount']=number_format($info['amount_discount'],2);
+        }
+        else
+        {
+            $row['amount_discount']='';
+        }
+        /*if(($info['amount_total']-$info['amount_payable'])>0)
         {
             $row['amount_discount']=number_format($info['amount_total']-$info['amount_payable'],2);
         }
         else
         {
             $row['amount_discount']='';
-        }
+        }*/
         if($info['amount_payable']>0)
         {
             $row['amount_payable']=number_format($info['amount_payable'],2);

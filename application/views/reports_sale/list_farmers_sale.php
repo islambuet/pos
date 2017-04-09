@@ -144,8 +144,8 @@ if(sizeof($action_buttons)>0)
                 rowsheight: 40,
                 columns: [
                     { text: '<?php echo $CI->lang->line('LABEL_CUSTOMER_NAME'); ?>', dataField: 'farmer_name',width:'200',cellsrenderer: cellsrenderer},
-                    { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE'); ?>', dataField: 'amount_payable',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
-                    { text: 'Sales Cancel', dataField: 'amount_cancel',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE'); ?>', dataField: 'amount_payable',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
+                    { text: 'Sales Cancel', dataField: 'amount_cancel',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Actual amount', dataField: 'amount_actual',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer}
 
                 ]
