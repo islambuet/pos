@@ -61,7 +61,7 @@ class Sales_sale extends Root_Controller
         {
             $this->system_save();
         }
-        elseif($action=="delete")
+        elseif($action=="delete")//sale cancel
         {
             $this->system_delete($id);
         }
@@ -69,7 +69,7 @@ class Sales_sale extends Root_Controller
         {
             $this->system_save_cancel();
         }
-        elseif($action=="reinvoice")
+        elseif($action=="reinvoice")//edit
         {
             $this->system_reinvoice();
         }
@@ -321,6 +321,11 @@ class Sales_sale extends Root_Controller
         $data['farmer_type']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('id ='.$data['item']['type_id']),1);
         if(sizeof($data['item'])>0)
         {
+            $assigned_outlet=$this->get_farmer_assigned_info($customer_id,$farmer_id);
+            if(!$assigned_outlet)
+            {
+                $data['farmer_type']['discount_non_coupon']=0;
+            }
             $data['item']['customer_id']=$customer_id;
 
 
@@ -486,15 +491,24 @@ class Sales_sale extends Root_Controller
         }
         else
         {
-            $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f');
-            $this->db->select('ft.*');
-            $this->db->join($this->config->item('table_pos_setup_farmer_type').' ft','ft.id = f.type_id','INNER');
-            $this->db->where('f.id',$data['farmer_id']);
-            $result=$this->db->get()->row_array();
-            if($result)
+            $assigned_outlet=$this->get_farmer_assigned_info($data['customer_id'],$data['farmer_id']);
+            if(!$assigned_outlet)
             {
-                $data['discount_percentage']=$result['discount_non_coupon'];
+                $data['discount_percentage']=0;
             }
+            else
+            {
+                $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f');
+                $this->db->select('ft.*');
+                $this->db->join($this->config->item('table_pos_setup_farmer_type').' ft','ft.id = f.type_id','INNER');
+                $this->db->where('f.id',$data['farmer_id']);
+                $result=$this->db->get()->row_array();
+                if($result)
+                {
+                    $data['discount_percentage']=$result['discount_non_coupon'];
+                }
+            }
+
         }
         $data['date_sale']=$time;
         $data['date_created']=$time;
@@ -1097,6 +1111,11 @@ class Sales_sale extends Root_Controller
             $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
             $this->json_return($ajax);
         }
+    }
+    public function get_farmer_assigned_info($customer_id,$farmer_id)
+    {
+        $assigned=Query_helper::get_info($this->config->item('table_pos_setup_farmer_outlet'),'*',array('farmer_id ='.$farmer_id,'revision =1','customer_id ='.$customer_id),1);
+        return $assigned;
     }
 
 
