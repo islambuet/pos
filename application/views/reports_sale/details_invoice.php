@@ -198,7 +198,7 @@ $CI=& get_instance();
             </div>
             <div class="clearfix"></div>
         </div>
-        <div style="overflow-x: auto;" class="row show-grid" id="order_items_container">
+        <div style="overflow-x: auto;" class="row show-grid">
             <table class="table table-bordered">
                 <thead>
                 <tr>
