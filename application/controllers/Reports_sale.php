@@ -453,7 +453,7 @@ class Reports_sale extends Root_Controller
             {
                 $ajax['system_message']=$this->message;
             }
-            $ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
+            //$ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
             $this->json_return($ajax);
         }
         else

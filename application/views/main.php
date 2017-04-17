@@ -18,8 +18,9 @@ foreach($results as $result)
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Demo POS</title>
-        <link rel="icon" type="image/ico" href="http://180.234.223.203/login/images/favicon.ico"/>
+        <title>POS</title>
+        <link rel="shortcut icon" href="http://malikseeds.com/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="http://malikseeds.com/favicon.ico" type="image/x-icon">
         <meta charset="utf-8">
         <link rel="stylesheet" href="<?php echo base_url('css/bootstrap.min.css');?>">
         <link rel="stylesheet" href="<?php echo base_url('css/style.css');?>">
