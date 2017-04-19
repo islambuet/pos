@@ -12,6 +12,7 @@ $config['table_pos_setup_designation'] = 'pos_setup_designation';
 $config['table_pos_setup_farmer_type'] = 'pos_setup_farmer_type';
 $config['table_pos_setup_farmer_farmer'] = 'pos_setup_farmer_farmer';
 $config['table_pos_setup_farmer_outlet'] = 'pos_setup_farmer_outlet';
+$config['table_pos_setup_exp_date'] = 'pos_setup_exp_date';
 
 $config['table_pos_sale'] = 'pos_sale';
 $config['table_pos_sale_details'] = 'pos_sale_details';

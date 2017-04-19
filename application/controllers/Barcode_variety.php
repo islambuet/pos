@@ -112,6 +112,14 @@ class Barcode_variety extends Root_Controller
             $this->db->where('vp.id',$item_id);
             $data['item']=$this->db->get()->row_array();
             $data['item']['line1']='Malik Seeds';
+            $result=Query_helper::get_info($this->config->item('table_pos_setup_exp_date'),'date_expire',array(),1,0,array('id desc'));
+            if(!$result)
+            {
+                $ajax['status']=false;
+                $ajax['system_message']="Please Set Expire Date";
+                $this->json_return($ajax);
+            }
+            $data['item']['date_expire']=System_helper::display_date($result['date_expire']);
             $data['outlets']=Query_helper::get_info($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers'),array('name_short','CONCAT(customer_code," - ",name) text'),array('status ="'.$this->config->item('system_status_active').'"','type ="Outlet"'));
             $data['title']='Variety Barcode Generate';
             $ajax['status']=true;
@@ -159,6 +167,8 @@ class Barcode_variety extends Root_Controller
             $data['item']['line1']=$item['line1'];
             $data['item']['outlet']=$item['outlet'];
             $data['item']['bar_code']=System_helper::get_variety_barcode($data['item']['crop_id'],$data['item']['variety_id'],$data['item']['pack_id']);
+            $result=Query_helper::get_info($this->config->item('table_pos_setup_exp_date'),'date_expire',array(),1,0,array('id desc'));
+            $data['item']['date_expire']=System_helper::display_date($result['date_expire']);
             $ajax['status']=true;
             if($item['barcode_purpose']=='packet')
             {
