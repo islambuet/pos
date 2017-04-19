@@ -10,7 +10,7 @@ class Setup_farmer_type extends Root_Controller
         parent::__construct();
         $this->message="";
         $this->permissions=User_helper::get_permission('Setup_farmer_type');
-        $this->controller_url='Setup_farmer_type';
+        $this->controller_url='setup_farmer_type';
     }
 
     public function index($action="list",$id=0)
