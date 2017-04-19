@@ -214,6 +214,9 @@ class Reports_sale extends Root_Controller
                 if($prev_outlet_name!=$result['outlet_name'])
                 {
                     $items[]=$this->get_outlet_invoice_row($outlet_total);
+                    $outlet_total['amount_total']=0;
+                    $outlet_total['amount_discount']=0;
+                    $outlet_total['amount_payable']=0;
                     $outlet_total['amount_actual']=0;
                     $prev_outlet_name=$result['outlet_name'];
                 }
