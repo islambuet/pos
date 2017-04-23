@@ -74,6 +74,7 @@ $(document).ready(function()
         {
             if(xhr.responseJSON.system_redirect_url)
             {
+                system_resized_image_files=[];
                 window.location.replace(xhr.responseJSON.system_redirect_url);
 
                 //window.history.pushState(null, "Search Results",xhr.responseJSON.page_url);
@@ -81,6 +82,7 @@ $(document).ready(function()
             }
             if(xhr.responseJSON.system_page_url)
             {
+                system_resized_image_files=[];
                 window.history.pushState(null, "Search Results",xhr.responseJSON.system_page_url);
                 //window.history.replaceState(null, "Search Results",xhr.responseJSON.system_page_url);
             }
@@ -120,12 +122,23 @@ $(document).ready(function()
         {
             return true;
         }
+        var form_data=new FormData(this);
+        var file;
+        for(var i=0;i<system_resized_image_files.length;i++)
+        {
+            file=system_resized_image_files[i];
+            if(form_data.has(file.key))
+            {
+                form_data.set(file.key,file.value,file.name);
+            }
+        }
+        system_resized_image_files=[];
         event.preventDefault();
         $.ajax({
             url: $(this).attr("action"),
             type: $(this).attr("method"),
             dataType: "JSON",
-            data: new FormData(this),
+            data: form_data,
             processData: false,
             contentType: false,
             success: function (data, status)
@@ -186,39 +199,83 @@ $(document).ready(function()
         {
             return;
         }
-        var container=$(this).attr('data-preview-container');
-        if(container)
+        if(this.files && this.files[0])
         {
-            if(this.files && this.files[0])
+            var input_file=$(this);
+            var container=$(this).attr('data-preview-container');
+            var file=this.files[0];
+            var file_type=file.type;
+            if(file_type && file_type.substr(0,5)=="image")
             {
-                var file_type=this.files[0].type;
-                if(file_type && file_type.substr(0,5)=="image")
+                var key=input_file.attr('name');
+                var file_name=file.name.replace(/\.[^/.]+$/,"");
+                //var file_name=file.name;
+                var preview_height=200;
+                if($(this).attr('data-preview-height'))
                 {
-                    var preview_height=200;
-                    if($(this).attr('data-preview-height'))
+                    preview_height=$(this).attr('data-preview-height');
+                }
+                var path=URL.createObjectURL(file);
+                if(container)
+                {
+                    var img_tag='<img height="'+preview_height+'" src="'+path+'" >';
+                    $(container).html(img_tag);
+                }
+                var img=new Image();
+                img.src=path;
+                img.onload=function()
+                {
+                    var MAX_WIDTH = 800;
+                    var MAX_HEIGHT = 600;
+                    var width = img.naturalWidth;
+                    var height = img.naturalHeight;
+                    if((width>MAX_WIDTH)||(height>MAX_HEIGHT))
                     {
-                        preview_height=$(this).attr('data-preview-height');
-                    }
-                    var reader = new FileReader();
+                        if((width/height)>(MAX_WIDTH/MAX_HEIGHT))
+                        {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                        else
+                        {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                        var canvas = document.createElement("canvas");
+                        canvas.width = width;
+                        canvas.height = height;
+                        var context = canvas.getContext("2d");
+                        context.drawImage(img, 0, 0, width, height);
+                        canvas.toBlob(function(blob)
+                        {
+                            system_resized_image_files[system_resized_image_files.length]={
+                                key:key,
+                                value:blob,
+                                name:file_name+'.png'
+                            };
+                            //saveAs(blob, file.name);
+                            input_file.val(null);
+                            //input_file.parent().find('.badge').remove();
+                        });
+                        //console.log('with resize');
 
-                    reader.onload = function (e)
-                    {
-                        var img_tag='<img height="'+preview_height+'" src="'+ e.target.result+'" >';
-                        $(container).html(img_tag);
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-                else
-                {
-                    $(container).html(this.files[0].name);
-                }
+                    }
+                    //console.log('without resize');
+                };
+            }
+            else if(container)
+            {
+                $(container).html(file.name);
+            }
+            else
+            {
+                console.log('no container for file');
             }
         }
         else
         {
-            console.log('no container');
+            console.log('no file attached');
         }
-
     });
     /*button start*/
     $(document).on("click", "#button_action_clear", function(event)

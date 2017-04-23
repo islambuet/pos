@@ -72,6 +72,7 @@ foreach($results as $result)
             var base_url = "<?php echo base_url(); ?>";
             var display_date_format = "dd-M-yy";
             var SELECT_ONE_ITEM = "<?php echo $CI->lang->line('SELECT_ONE_ITEM'); ?>";
+            var system_resized_image_files=[];
             var system_crops=JSON.parse('<?php echo json_encode($system_crops);?>');
             var system_types=JSON.parse('<?php echo json_encode($system_types);?>');
             var system_varieties=JSON.parse('<?php echo json_encode($system_varieties);?>');
