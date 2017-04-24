@@ -51,6 +51,10 @@ class Reports_sale extends Root_Controller
         {
             $this->system_get_items_farmer_invoice();
         }
+        elseif($action=='get_items_variety_sale')
+        {
+            $this->system_get_items_variety_sale();
+        }
         elseif($action=="details_invoice")
         {
             $this->system_details_invoice($id);
@@ -76,6 +80,11 @@ class Reports_sale extends Root_Controller
             {
                 $data['farmer_types']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC','id ASC'));
                 $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_farmer_sale",$data,true));
+            }
+            elseif($report_name=='variety_sale')
+            {
+                $data['farmer_types']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC','id ASC'));
+                $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_variety_sale",$data,true));
             }
             else
             {
@@ -142,6 +151,11 @@ class Reports_sale extends Root_Controller
                     $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_farmers_sale",$data,true));
                 }
 
+            }
+            elseif($report_name=='variety_sale')
+            {
+                $data['title']="Product Sales Report";
+                $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_variety_sale",$data,true));
             }
             else
             {
@@ -767,6 +781,369 @@ class Reports_sale extends Root_Controller
         else
         {
             $row['amount_actual']='';
+        }
+        return $row;
+
+    }
+    private function system_get_items_variety_sale()
+    {
+        $items=array();
+        $customer_id=$this->input->post('customer_id');
+        $farmer_type=$this->input->post('farmer_type');
+        $farmer_id=$this->input->post('farmer_id');
+        $crop_id=$this->input->post('crop_id');
+        $crop_type_id=$this->input->post('crop_type_id');
+        $variety_id=$this->input->post('variety_id');
+        $date_end=$this->input->post('date_end');
+        $date_start=$this->input->post('date_start');
+
+        //get variety infos
+        $this->db->from($this->config->item('table_pos_sale_details').' pod');
+        $this->db->select('pod.variety_id,pod.pack_size_id,pod.pack_size');
+        $this->db->select('v.name variety_name');
+        $this->db->select('type.id type_id,type.name type_name');
+
+        $this->db->select('crop.id crop_id,crop.name crop_name');
+        $this->db->join($this->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_varieties').' v','v.id =pod.variety_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
+        $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crops').' crop','crop.id =type.crop_id','INNER');
+        $this->db->where('sale.customer_id',$customer_id);
+        if($crop_id>0)
+        {
+            $this->db->where('crop.id',$crop_id);
+            if($crop_type_id>0)
+            {
+                $this->db->where('type.id',$crop_type_id);
+                if($variety_id>0)
+                {
+                    $this->db->where('v.id',$variety_id);
+                }
+            }
+        }
+        if($farmer_id>0)
+        {
+            $this->db->where('sale.farmer_id',$farmer_id);
+        }
+        $this->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+        $this->db->order_by('crop.ordering ASC');
+        $this->db->order_by('type.ordering ASC');
+        $this->db->order_by('v.ordering ASC');
+        $results=$this->db->get()->result_array();
+        $variety_ids=array();
+        $varieties=array();
+        foreach($results as $result)
+        {
+            $varieties[$result['variety_id']][$result['pack_size_id']]=$result;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_quantity']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_quantity_kg']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_amount']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_discount']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_payable']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_quantity']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_quantity_kg']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_amount']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_discount']=0;
+            $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_payable']=0;
+            $variety_ids[$result['variety_id']]=$result['variety_id'];
+        }
+        if(sizeof($variety_ids)>0)
+        {
+            //sale count start to end
+            $this->db->from($this->config->item('table_pos_sale_details').' pod');
+            $this->db->select('pod.variety_id,pod.pack_size_id,pod.pack_size');
+            $this->db->select('SUM(pod.quantity_sale) invoice_quantity');
+            $this->db->select('SUM(pod.quantity_sale * pod.pack_size) invoice_quantity_kg');
+            $this->db->select('SUM(pod.quantity_sale * pod.price_unit) invoice_amount');
+            $this->db->select('SUM(pod.quantity_sale * pod.price_unit * sale.discount_percentage/100) invoice_discount');
+            $this->db->join($this->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+            if($farmer_type>0)
+            {
+                $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+                $this->db->where('f.type_id',$farmer_type);
+                if($farmer_id>0)
+                {
+                    $this->db->where('sale.farmer_id',$farmer_id);
+                }
+            }
+            $this->db->where('pod.revision',1);
+            $this->db->where('sale.customer_id',$customer_id);
+            $this->db->where('sale.date_sale <=',$date_end);
+            $this->db->where('sale.date_sale >=',$date_start);
+            $this->db->where_in('pod.variety_id',$variety_ids);
+            $this->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+            $results=$this->db->get()->result_array();
+            foreach($results as $result)
+            {
+                $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_quantity']=$result['invoice_quantity'];
+                $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_quantity_kg']=$result['invoice_quantity_kg'];
+                $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_amount']=$result['invoice_amount'];
+                $varieties[$result['variety_id']][$result['pack_size_id']]['invoice_discount']=$result['invoice_discount'];
+            }
+
+            //sale cancel start to end
+            $this->db->from($this->config->item('table_pos_sale_details').' pod');
+            $this->db->select('pod.variety_id,pod.pack_size_id,pod.pack_size');
+            $this->db->select('SUM(pod.quantity_sale) cancel_quantity');
+            $this->db->select('SUM(pod.quantity_sale * pod.pack_size) cancel_quantity_kg');
+            $this->db->select('SUM(pod.quantity_sale * pod.price_unit) cancel_amount');
+            $this->db->select('SUM(pod.quantity_sale * pod.price_unit * sale.discount_percentage/100) cancel_discount');
+            $this->db->join($this->config->item('table_pos_sale').' sale','sale.id =pod.sale_id','INNER');
+            if($farmer_type>0)
+            {
+                $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
+                $this->db->where('f.type_id',$farmer_type);
+                if($farmer_id>0)
+                {
+                    $this->db->where('sale.farmer_id',$farmer_id);
+                }
+            }
+            $this->db->where('sale.status',$this->config->item('system_status_inactive'));
+            $this->db->where('pod.revision',1);
+            $this->db->where('sale.customer_id',$customer_id);
+            $this->db->where('sale.date_canceled <=',$date_end);
+            $this->db->where('sale.date_canceled >=',$date_start);
+            $this->db->where_in('pod.variety_id',$variety_ids);
+            $this->db->group_by(array('pod.variety_id','pod.pack_size_id'));
+            $results=$this->db->get()->result_array();
+            foreach($results as $result)
+            {
+                $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_quantity']=$result['cancel_quantity'];
+                $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_quantity_kg']=$result['cancel_quantity_kg'];
+                $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_amount']=$result['cancel_amount'];
+                $varieties[$result['variety_id']][$result['pack_size_id']]['cancel_discount']=$result['cancel_discount'];
+            }
+            $type_total=array();
+            $crop_total=array();
+            $grand_total=array();
+            $type_total['crop_name']='';
+            $type_total['type_name']='';
+            $type_total['variety_name']='Total Type';
+
+            $crop_total['crop_name']='';
+            $crop_total['type_name']='Total Crop';
+            $crop_total['variety_name']='';
+
+            $grand_total['crop_name']='Grand Total';
+            $grand_total['type_name']='';
+            $grand_total['variety_name']='';
+
+            $grand_total['pack_size']=$crop_total['pack_size']=$type_total['pack_size']='';
+            $grand_total['invoice_quantity']=$crop_total['invoice_quantity']=$type_total['invoice_quantity']=0;
+            $grand_total['invoice_quantity_kg']=$crop_total['invoice_quantity_kg']=$type_total['invoice_quantity_kg']=0;
+            $grand_total['invoice_amount']=$crop_total['invoice_amount']=$type_total['invoice_amount']=0;
+            $grand_total['invoice_discount']=$crop_total['invoice_discount']=$type_total['invoice_discount']=0;
+            $grand_total['invoice_payable']=$crop_total['invoice_payable']=$type_total['invoice_payable']=0;
+            $grand_total['cancel_quantity']=$crop_total['cancel_quantity']=$type_total['cancel_quantity']=0;
+            $grand_total['cancel_quantity_kg']=$crop_total['cancel_quantity_kg']=$type_total['cancel_quantity_kg']=0;
+            $grand_total['cancel_amount']=$crop_total['cancel_amount']=$type_total['cancel_amount']=0;
+            $grand_total['cancel_discount']=$crop_total['cancel_discount']=$type_total['cancel_discount']=0;
+            $grand_total['cancel_payable']=$crop_total['cancel_payable']=$type_total['cancel_payable']=0;
+            $prev_crop_name='';
+            $prev_type_name='';
+            $first_row=true;
+            foreach($varieties as $pack)
+            {
+                foreach($pack as $info)
+                {
+                    if(!$first_row)
+                    {
+                        if($prev_crop_name!=$info['crop_name'])
+                        {
+                            $items[]=$this->get_variety_sale_row($type_total);
+                            $items[]=$this->get_variety_sale_row($crop_total);
+                            $crop_total['invoice_quantity']=$type_total['invoice_quantity']=0;
+                            $crop_total['invoice_quantity_kg']=$type_total['invoice_quantity_kg']=0;
+                            $crop_total['invoice_amount']=$type_total['invoice_amount']=0;
+                            $crop_total['invoice_discount']=$type_total['invoice_discount']=0;
+                            $crop_total['invoice_payable']=$type_total['invoice_payable']=0;
+                            $crop_total['cancel_quantity']=$type_total['cancel_quantity']=0;
+                            $crop_total['cancel_quantity_kg']=$type_total['cancel_quantity_kg']=0;
+                            $crop_total['cancel_amount']=$type_total['cancel_amount']=0;
+                            $crop_total['cancel_discount']=$type_total['cancel_discount']=0;
+                            $crop_total['cancel_payable']=$type_total['cancel_payable']=0;
+                            $prev_crop_name=$info['crop_name'];
+                            $prev_type_name=$info['type_name'];
+                            //sum and reset type total
+                            //sum and reset crop total
+                        }
+                        elseif($prev_type_name!=$info['type_name'])
+                        {
+                            $items[]=$this->get_variety_sale_row($type_total);
+                            $type_total['invoice_quantity']=0;
+                            $type_total['invoice_quantity_kg']=0;
+                            $type_total['invoice_amount']=0;
+                            $type_total['invoice_discount']=0;
+                            $type_total['invoice_payable']=0;
+                            $type_total['cancel_quantity']=0;
+                            $type_total['cancel_quantity_kg']=0;
+                            $type_total['cancel_amount']=0;
+                            $type_total['cancel_discount']=0;
+                            $type_total['cancel_payable']=0;
+                            $info['crop_name']='';
+                            $prev_type_name=$info['type_name'];
+                            //sum and reset type total
+                        }
+                        else
+                        {
+                            $info['crop_name']='';
+                            $info['type_name']='';
+                        }
+                    }
+                    else
+                    {
+                        $prev_crop_name=$info['crop_name'];
+                        $prev_type_name=$info['type_name'];
+                        $first_row=false;
+                    }
+                    $type_total['invoice_quantity']+=$info['invoice_quantity'];
+                    $crop_total['invoice_quantity']+=$info['invoice_quantity'];
+                    $grand_total['invoice_quantity']+=$info['invoice_quantity'];
+                    $type_total['invoice_quantity_kg']+=$info['invoice_quantity_kg'];
+                    $crop_total['invoice_quantity_kg']+=$info['invoice_quantity_kg'];
+                    $grand_total['invoice_quantity_kg']+=$info['invoice_quantity_kg'];
+                    $type_total['invoice_amount']+=$info['invoice_amount'];
+                    $crop_total['invoice_amount']+=$info['invoice_amount'];
+                    $grand_total['invoice_amount']+=$info['invoice_amount'];
+                    $type_total['invoice_discount']+=$info['invoice_discount'];
+                    $crop_total['invoice_discount']+=$info['invoice_discount'];
+                    $grand_total['invoice_discount']+=$info['invoice_discount'];
+
+                    $type_total['cancel_quantity']+=$info['cancel_quantity'];
+                    $crop_total['cancel_quantity']+=$info['cancel_quantity'];
+                    $grand_total['cancel_quantity']+=$info['cancel_quantity'];
+                    $type_total['cancel_quantity_kg']+=$info['cancel_quantity_kg'];
+                    $crop_total['cancel_quantity_kg']+=$info['cancel_quantity_kg'];
+                    $grand_total['cancel_quantity_kg']+=$info['cancel_quantity_kg'];
+                    $type_total['cancel_amount']+=$info['cancel_amount'];
+                    $crop_total['cancel_amount']+=$info['cancel_amount'];
+                    $grand_total['cancel_amount']+=$info['cancel_amount'];
+                    $type_total['cancel_discount']+=$info['cancel_discount'];
+                    $crop_total['cancel_discount']+=$info['cancel_discount'];
+                    $grand_total['cancel_discount']+=$info['cancel_discount'];
+                    $items[]=$this->get_variety_sale_row($info);
+                }
+            }
+            $items[]=$this->get_variety_sale_row($type_total);
+            $items[]=$this->get_variety_sale_row($crop_total);
+            $items[]=$this->get_variety_sale_row($grand_total);
+        }
+        $this->json_return($items);
+    }
+    private function get_variety_sale_row($info)
+    {
+        $row=array();
+        $row['crop_name']=$info['crop_name'];
+        $row['type_name']=$info['type_name'];
+        $row['variety_name']=$info['variety_name'];
+        $row['pack_size']=$info['pack_size'];
+
+        if($info['invoice_quantity']>0)
+        {
+            $row['invoice_quantity']=$info['invoice_quantity'];
+        }
+        else
+        {
+            $row['invoice_quantity']='';
+        }
+        if($info['invoice_amount']>0)
+        {
+            $row['invoice_amount']=number_format($info['invoice_amount'],2);
+        }
+        else
+        {
+            $row['invoice_amount']='';
+        }
+        if($info['invoice_discount']>0)
+        {
+            $row['invoice_discount']=number_format($info['invoice_discount'],2);
+        }
+        else
+        {
+            $row['invoice_discount']='';
+        }
+        if(($info['invoice_amount']-$info['invoice_discount'])!=0)
+        {
+            $row['invoice_payable']=number_format($info['invoice_amount']-$info['invoice_discount'],2);
+        }
+        else
+        {
+            $row['invoice_payable']='';
+        }
+
+        if($info['cancel_quantity']>0)
+        {
+            $row['cancel_quantity']=$info['cancel_quantity'];
+        }
+        else
+        {
+            $row['cancel_quantity']='';
+        }
+        if($info['cancel_amount']>0)
+        {
+            $row['cancel_amount']=number_format($info['cancel_amount'],2);
+        }
+        else
+        {
+            $row['cancel_amount']='';
+        }
+        if($info['cancel_discount']>0)
+        {
+            $row['cancel_discount']=number_format($info['cancel_discount'],2);
+        }
+        else
+        {
+            $row['cancel_discount']='';
+        }
+        if(($info['cancel_amount']-$info['cancel_discount'])!=0)
+        {
+            $row['cancel_payable']=number_format($info['cancel_amount']-$info['cancel_discount'],2);
+        }
+        else
+        {
+            $row['cancel_payable']='';
+        }
+        if($info['invoice_quantity']-$info['cancel_quantity']!=0)
+        {
+            $row['actual_quantity']=$info['invoice_quantity']-$info['cancel_quantity'];
+        }
+        else
+        {
+            $row['actual_quantity']='';
+        }
+        if(($info['invoice_quantity_kg']-$info['cancel_quantity_kg'])!=0)
+        {
+            $row['actual_quantity_kg']=number_format((($info['invoice_quantity_kg']-$info['cancel_quantity_kg'])/1000),3,'.','');
+        }
+        else
+        {
+            $row['actual_quantity_kg']='';
+        }
+
+
+        if(($info['invoice_amount']-$info['cancel_amount'])!=0)
+        {
+            $row['actual_amount']=number_format($info['invoice_amount']-$info['cancel_amount'],2);
+        }
+        else
+        {
+            $row['actual_amount']='';
+        }
+        if(($info['invoice_discount']-$info['cancel_discount'])!=0)
+        {
+            $row['actual_discount']=number_format($info['invoice_discount']-$info['cancel_discount'],2);
+        }
+        else
+        {
+            $row['actual_discount']='';
+        }
+        if((($info['invoice_amount']-$info['cancel_amount'])-($info['invoice_discount']-$info['cancel_discount']))!=0)
+        {
+            $row['actual_payable']=number_format((($info['invoice_amount']-$info['cancel_amount'])-($info['invoice_discount']-$info['cancel_discount'])),2);
+        }
+        else
+        {
+            $row['actual_payable']='';
         }
         return $row;
 

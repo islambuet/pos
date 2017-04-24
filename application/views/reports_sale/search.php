@@ -16,10 +16,8 @@
         <div class="col-sm-4 col-xs-8">
             <select id="report_name" class="form-control">
                 <option value="outlet_invoice">Outlet Invoice Wise</option>
-<!--                <option value="outlet_variety">Outlet Product wise</option>-->
                 <option value="farmer_sale">Farmer Sales Report</option>
-                <!--                <option value="customer_variety">Customer variety wise</option>-->
-                <!--                <option value="variety_customer">Variety Customer wise</option>-->
+                <option value="variety_sale">Product wise</option>
             </select>
         </div>
     </div>
@@ -43,6 +41,7 @@
         $(document).on("change","#report_name",function()
         {
             $("#report_search_container").html("");
+            $("#system_report_container").html("");
             $.ajax({
                 url:'<?php echo site_url($CI->controller_url.'/index/search') ?>',
                 type: 'POST',
