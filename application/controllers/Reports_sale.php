@@ -70,9 +70,12 @@ class Reports_sale extends Root_Controller
         {
             $data['title']="Sale Report Search";
             $ajax['status']=true;
-            $report_name=$this->input->post('report_name');
-            $data['report_name']=$report_name;
-            if($report_name=='outlet_invoice')
+            //$report_name=$this->input->post('report_name');
+            //$data['report_name']=$report_name;
+            $data['farmer_types']=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC','id ASC'));
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/search",$data,true));
+            $ajax['system_page_url']=site_url($this->controller_url);
+            /*if($report_name=='outlet_invoice')
             {
                 $ajax['system_content'][]=array("id"=>"#report_search_container","html"=>$this->load->view($this->controller_url."/search_outlet_invoice",$data,true));
             }
@@ -90,7 +93,7 @@ class Reports_sale extends Root_Controller
             {
                 $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/search",$data,true));
                 $ajax['system_page_url']=site_url($this->controller_url);
-            }
+            }*/
 
 
             if($this->message)
@@ -128,13 +131,6 @@ class Reports_sale extends Root_Controller
             $ajax['status']=true;
             if($report_name=='outlet_invoice')
             {
-                if(!isset($reports['customer_ids']))
-                {
-                    $ajax['status']=false;
-                    $ajax['system_message']='Please Select at least one outlet';
-                    $this->json_return($ajax);
-                    die();
-                }
                 $data['title']="Invoice Wise Sales Report";
                 $ajax['system_content'][]=array("id"=>"#system_report_container","html"=>$this->load->view($this->controller_url."/list_outlet_invoice",$data,true));
             }
@@ -180,7 +176,8 @@ class Reports_sale extends Root_Controller
     private function system_get_items_outlet_invoice()
     {
 
-        $customer_ids=$this->input->post('customer_ids');
+        //$customer_ids=$this->input->post('customer_ids');
+        $customer_id=$this->input->post('customer_id');
 
         $date_end=$this->input->post('date_end');
         $date_start=$this->input->post('date_start');
@@ -191,7 +188,8 @@ class Reports_sale extends Root_Controller
         $this->db->select('f.name farmer_name');
         $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id =sale.customer_id','INNER');
         $this->db->join($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
-        $this->db->where_in('customer_id',$customer_ids);
+        //$this->db->where_in('customer_id',$customer_ids);
+        $this->db->where('customer_id',$customer_id);
         $where='(sale.date_sale >='.$date_start.' AND sale.date_sale <='.$date_end.')';
         $where.=' OR (sale.date_canceled >='.$date_start.' AND sale.date_canceled <='.$date_end.')';
 
@@ -809,6 +807,9 @@ class Reports_sale extends Root_Controller
         $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crop_types').' type','type.id =v.crop_type_id','INNER');
         $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_setup_classification_crops').' crop','crop.id =type.crop_id','INNER');
         $this->db->where('sale.customer_id',$customer_id);
+        $where='(sale.date_sale >='.$date_start.' AND sale.date_sale <='.$date_end.')';
+        $where.=' OR (sale.date_canceled >='.$date_start.' AND sale.date_canceled <='.$date_end.')';
+        $this->db->where('('.$where.')');
         if($crop_id>0)
         {
             $this->db->where('crop.id',$crop_id);
