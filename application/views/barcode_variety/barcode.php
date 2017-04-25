@@ -6,7 +6,7 @@ $CI=& get_instance();
     <div style="width: 150px;float: left;">
         <div style="font-size:12px;line-height: 14px;"><?php echo $item['line1']; ?></div>
         <img src="<?php echo site_url('barcode_generator/get_image/variety/'.($item['bar_code']));  ?>">
-        <div><?php echo $item['bar_code'];?></div>
+        <div><?php echo $item['bar_code'].' ('.$item['pack_size_name'].' g)';?></div>
         <div>MRP(Tk.): <?php echo number_format($item['price'],2);?></div>
         <div>EXP. Date: <?php echo $item['date_expire'];?></div>
         <div><?php echo $item['outlet']; ?></div>
@@ -14,7 +14,7 @@ $CI=& get_instance();
     <div style="width: 150px;float: left;margin-left: 20px;">
         <div style="font-size:12px;line-height: 14px;"><?php echo $item['line1']; ?></div>
         <img src="<?php echo site_url('barcode_generator/get_image/variety/'.($item['bar_code']));  ?>">
-        <div><?php echo $item['bar_code'];?></div>
+        <div><?php echo $item['bar_code'].' ('.$item['pack_size_name'].' g)';?></div>
         <div>MRP(Tk.): <?php echo number_format($item['price'],2);?></div>
         <div>EXP. Date: <?php echo $item['date_expire'];?></div>
         <div><?php echo $item['outlet']; ?></div>
