@@ -260,11 +260,11 @@ class Setup_users_info extends Root_Controller
             $data['title']="Assign Outlet For(".$data['user_info']['name'].')';
             $ajax['status']=true;
             $data['outlets']=Query_helper::get_info($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers'),array('id value','CONCAT(customer_code," - ",name) text'),array('status ="'.$this->config->item('system_status_active').'"','type ="Outlet"'));
-            $results=Query_helper::get_info($this->config->item('table_pos_setup_user_outlet'),array('customer_id'),array('user_id ='.$user_id,'revision =1'));
+            $results=Query_helper::get_info($this->config->item('table_pos_setup_user_outlet'),'*',array('user_id ='.$user_id,'revision =1'));
             $data['assigned_outlets']=array();
             foreach($results as $result)
             {
-                $data['assigned_outlets'][]=$result['customer_id'];
+                $data['assigned_outlets'][$result['customer_id']]=$result;
             }
             $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view($this->controller_url."/edit_outlet",$data,true));
             if($this->message)
@@ -339,6 +339,7 @@ class Setup_users_info extends Root_Controller
             $data['title']="Details of User (".$data['user_info']['name'].')';
 
             $this->db->from($this->config->item('table_pos_setup_user_outlet').' uo');
+            $this->db->select('uo.commission');
             $this->db->select('CONCAT(cus.customer_code," - ",cus.name) text');
             $this->db->join($this->config->item('system_db_ems').'.'.$this->config->item('table_ems_csetup_customers').' cus','cus.id = uo.customer_id','INNER');
             $this->db->where('uo.revision',1);
@@ -521,6 +522,7 @@ class Setup_users_info extends Root_Controller
             $this->db->update($this->config->item('table_pos_setup_user_outlet'));
 
             $items=$this->input->post('items');
+            $commissions=$this->input->post('commission');;
             if(is_array($items))
             {
                 foreach($items as $customer_id)
@@ -528,6 +530,14 @@ class Setup_users_info extends Root_Controller
                     $data=array();
                     $data['user_id']=$id;
                     $data['customer_id']=$customer_id;
+                    if(isset($commissions[$customer_id]))
+                    {
+                        $data['commission'] = $commissions[$customer_id];
+                    }
+                    else
+                    {
+                        $data['commission'] = 0;
+                    }
                     $data['user_created'] = $user->user_id;
                     $data['date_created'] = $time;
                     $data['revision'] = 1;

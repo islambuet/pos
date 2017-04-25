@@ -142,12 +142,36 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <?php
             if(sizeof($assigned_outlets)>0)
             {
-                foreach($assigned_outlets as $outlet)
-                {
                 ?>
-                    <label class="control-label"><?php echo $outlet['text']; ?></label><br>
+                <div style="overflow-x: auto;" class="row show-grid">
+                    <table class="table table-bordered" style="width: 600px;">
+                        <thead>
+                        <tr>
+                            <th style="">Outlet</th>
+                            <th>Commission %</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                            foreach($assigned_outlets as $outlet)
+                            {
+                                ?>
+                                <tr>
+                                    <td>
+                                        <label class="control-label"><?php echo $outlet['text']; ?></label>
+                                    </td>
+                                    <td>
+                                        <label class="control-label"><?php echo $outlet['commission']; ?></label>
+                                    </td>
+
+                                </tr>
+                            <?php
+                            }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
                 <?php
-                }
             }
             else
             {

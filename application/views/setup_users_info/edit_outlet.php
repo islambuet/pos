@@ -31,23 +31,38 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </div>
             <div class="clearfix"></div>
         </div>
-        <div style="" class="row show-grid">
-            <div class="col-xs-12">
+        <div style="overflow-x: auto;" class="row show-grid">
+            <table class="table table-bordered" style="width: 600px;">
+                <thead>
+                <tr>
+                    <th style="">Outlet</th>
+                    <th>Commission %</th>
+                </tr>
+                </thead>
+                <tbody>
                 <?php
                 foreach($outlets as $item)
                 {
                     ?>
-                    <div class="checkbox">
-                        <label title="<?php echo $item['text']; ?>">
-                            <input type="checkbox" name="items[]" value="<?php echo $item['value']; ?>" <?php if(in_array($item['value'],$assigned_outlets)){echo 'checked';} ?>><?php echo $item['text']; ?>
-                        </label>
-                    </div>
+                    <tr>
+                        <td>
+                            <div class="checkbox" style="margin: 0;">
+                                <label title="<?php echo $item['text']; ?>">
+                                    <input type="checkbox" name="items[]" value="<?php echo $item['value']; ?>" <?php if(isset($assigned_outlets[$item['value']])){echo 'checked';} ?>><?php echo $item['text']; ?>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" name="commission[<?php echo $item['value']; ?>]" class="form-control" value="<?php if(isset($assigned_outlets[$item['value']])){echo $assigned_outlets[$item['value']]['commission'];}else{echo '0';} ?>"/>
+                        </td>
+
+                    </tr>
                 <?php
                 }
                 ?>
-            </div>
+                </tbody>
+            </table>
         </div>
-
     </div>
 
     <div class="clearfix"></div>
