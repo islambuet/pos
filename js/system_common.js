@@ -367,6 +367,7 @@ $(document).ready(function()
     $(document).on("click", "#button_jqx_load_more", function(event)
     {
         var jqx_grid_id='#system_jqx_container';
+        $(jqx_grid_id).jqxGrid('clearfilters',false);
         var jqx_source=$(jqx_grid_id).jqxGrid('source');
         var url=jqx_source['_source']['url'];
         var data=jqx_source['_source']['data'];
