@@ -180,10 +180,10 @@ class User_helper
         $CI->db->join($CI->config->item('system_db_ems').'.'.$CI->config->item('table_ems_setup_location_divisions').' division','division.id = zone.division_id','INNER');
         $CI->db->where('uo.revision',1);
         $CI->db->where('uo.user_id',$user->user_id);
-        $CI->db->order_by('division.ordering ASC');
-        $CI->db->order_by('zone.ordering ASC');
-        $CI->db->order_by('t.ordering ASC');
-        $CI->db->order_by('d.ordering ASC');
+        //$CI->db->order_by('division.ordering ASC');
+        //$CI->db->order_by('zone.ordering ASC');
+        //$CI->db->order_by('t.ordering ASC');
+        //$CI->db->order_by('d.ordering ASC');
         $CI->db->order_by('cus.ordering ASC');
         return $CI->db->get()->result_array();
     }
