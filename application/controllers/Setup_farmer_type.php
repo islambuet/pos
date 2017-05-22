@@ -82,6 +82,7 @@ class Setup_farmer_type extends Root_Controller
                 'name' => '',
                 'discount_coupon' => '',
                 'discount_non_coupon' => '',
+                'commission_distributor' => '',
                 'ordering' => 99,
                 'status' => $this->config->item('system_status_active')
             );

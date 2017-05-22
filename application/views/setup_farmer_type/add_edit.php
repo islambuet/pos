@@ -62,6 +62,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <input type="text" name="item[discount_non_coupon]" id="discount_non_coupon" class="form-control float_type_positive" value="<?php echo $item['discount_non_coupon'];?>"/>
             </div>
         </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_COMMISSION_DISTRIBUTOR');?></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <input type="text" name="item[commission_distributor]" id="commission_distributor" class="form-control float_type_positive" value="<?php echo $item['commission_distributor'];?>"/>
+            </div>
+        </div>
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">

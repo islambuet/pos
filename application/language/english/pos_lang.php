@@ -116,6 +116,7 @@ $lang['LABEL_CUSTOMER_NAME'] = 'Customer';
 $lang['LABEL_DISCOUNT'] = 'Discount';
 $lang['LABEL_DISCOUNT_COUPON'] = 'Coupon Discount';
 $lang['LABEL_DISCOUNT_NON_COUPON'] = 'Non Coupon Discount';
+$lang['LABEL_COMMISSION_DISTRIBUTOR'] = 'Distributor Commission';
 $lang['LABEL_BARCODE'] = 'Barcode';
 $lang['LABEL_INVOICE_NO'] = 'Invoice No';
 $lang['LABEL_PRICE_PACK'] = 'Price/Pack';

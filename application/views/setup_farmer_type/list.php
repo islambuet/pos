@@ -62,6 +62,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="name"><?php echo $CI->lang->line('LABEL_USERNAME'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="discount_coupon"><?php echo $CI->lang->line('LABEL_DISCOUNT_COUPON'); ?>(%)</label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="discount_non_coupon"><?php echo $CI->lang->line('LABEL_DISCOUNT_NON_COUPON'); ?>(%)</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="commission_distributor"><?php echo $CI->lang->line('LABEL_COMMISSION_DISTRIBUTOR'); ?>(%)</label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="ordering"><?php echo $CI->lang->line('LABEL_ORDER'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="status"><?php echo $CI->lang->line('STATUS'); ?></label>
             </div>
@@ -88,6 +89,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'name', type: 'string' },
                 { name: 'discount_coupon', type: 'string' },
                 { name: 'discount_non_coupon', type: 'string' },
+                { name: 'commission_distributor', type: 'string' },
                 { name: 'ordering', type: 'int' },
                 { name: 'status', type: 'string' }
             ],
@@ -117,6 +119,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name'},
                     { text: '<?php echo $CI->lang->line('LABEL_DISCOUNT_COUPON'); ?>(%)', dataField: 'discount_coupon',width:'150',cellsalign: 'right'},
                     { text: '<?php echo $CI->lang->line('LABEL_DISCOUNT_NON_COUPON'); ?>(%)', dataField: 'discount_non_coupon',width:'150',cellsalign: 'right'},
+                    { text: '<?php echo $CI->lang->line('LABEL_COMMISSION_DISTRIBUTOR'); ?>(%)', dataField: 'commission_distributor',width:'150',cellsalign: 'right'},
                     { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'150',cellsalign: 'right'},
                     { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',filtertype: 'list',width:'150',cellsalign: 'right'}
                 ]
