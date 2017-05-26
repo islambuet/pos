@@ -10,20 +10,10 @@ class Test extends CI_Controller
     }
     public function index()
     {
-        $this->load->library('email');
-        $this->email->from('program2@malikseeds.com', 'Shaiful');
-        $this->email->to('islambuet@gmail.com');
-        $this->email->subject('Email Tests');
-        $this->email->message('Testing the email class.');
-        if($this->email->send())
-        {
-            echo 'successful';
-        }
-        else
-
-        {
-            echo 'failed';
-        }
+        $year=2017;
+        $month=5;
+        echo (System_helper::get_time('1-may-2017')).'<br/>';
+        echo mktime(0,0,0,$month,1,$year);
     }
 
 }

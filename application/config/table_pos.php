@@ -14,6 +14,9 @@ $config['table_pos_setup_farmer_farmer'] = 'pos_setup_farmer_farmer';
 $config['table_pos_setup_farmer_outlet'] = 'pos_setup_farmer_outlet';
 $config['table_pos_setup_exp_date'] = 'pos_setup_exp_date';
 $config['table_pos_setup_expense_items'] = 'pos_setup_expense_items';
+$config['table_pos_setup_outlet_commission_expense'] = 'pos_setup_outlet_commission_expense';
+$config['table_pos_setup_outlet_commission_details'] = 'pos_setup_outlet_commission_details';
+$config['table_pos_setup_outlet_expense_details'] = 'pos_setup_outlet_expense_details';
 
 $config['table_pos_sale'] = 'pos_sale';
 $config['table_pos_sale_details'] = 'pos_sale_details';

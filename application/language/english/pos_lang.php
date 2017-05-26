@@ -62,6 +62,7 @@ $lang['LABEL_MONTH_START'] = 'Starting Month';
 $lang['LABEL_DATE_END'] = 'End Date';
 $lang['LABEL_MONTH_END'] = 'End Month';
 $lang['LABEL_YEAR'] = 'Year';
+$lang['LABEL_MONTH'] = 'Month';
 $lang['LABEL_FISCAL_YEAR'] = 'Fiscal Year';
 $lang['LABEL_SEASON'] = 'Season';
 //users
@@ -84,6 +85,7 @@ $lang['MSG_SAVED_FAIL'] = 'Failed to Save!';
 $lang['MSG_INVALID_INPUT'] = 'Invalid data entry';
 
 //Input Labels
+$lang['LABEL_ID'] = 'ID';
 $lang['SELECT'] = 'Select';
 $lang['LABEL_DESCRIPTION'] = 'Description';
 $lang['LABEL_NAME'] = 'Name';
@@ -128,4 +130,22 @@ $lang['LABEL_TOTAL_PRICE'] = 'Total Price';
 $lang['LABEL_CURRENT_STOCK'] = 'Current Stock';
 $lang['LABEL_CURRENT_STOCK_PIECES'] = 'Current Stock (pieces)';
 $lang['LABEL_CURRENT_STOCK_KG'] = 'Current Stock (Kg)';
+$lang['LABEL_AMOUNT_SALE'] = 'Sale';
+$lang['LABEL_AMOUNT_DISCOUNT'] = 'Discount';
 $lang['LABEL_AMOUNT_PAYABLE'] = 'Payable';
+$lang['LABEL_AMOUNT_PAYMENT'] = 'Payment';
+$lang['LABEL_AMOUNT_EXPENSE'] = 'Expense';
+$lang['LABEL_AMOUNT_COMMISSION'] = 'Commission';
+
+$lang['LABEL_MONTH_1'] = 'Jan';
+$lang['LABEL_MONTH_2'] = 'Feb';
+$lang['LABEL_MONTH_3'] = 'Mar';
+$lang['LABEL_MONTH_4'] = 'Apr';
+$lang['LABEL_MONTH_5'] = 'May';
+$lang['LABEL_MONTH_6'] = 'Jun';
+$lang['LABEL_MONTH_7'] = 'Juk';
+$lang['LABEL_MONTH_8'] = 'Aug';
+$lang['LABEL_MONTH_9'] = 'Sep';
+$lang['LABEL_MONTH_10'] = 'Oct';
+$lang['LABEL_MONTH_11'] = 'Nov';
+$lang['LABEL_MONTH_12'] = 'Dec';
