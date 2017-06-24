@@ -136,7 +136,7 @@ if(sizeof($action_buttons)>0)
         };
         var aggregatesrenderer=function (aggregates)
         {
-            return '<div style="position: relative; margin: 0px;padding: 5px;width: 100%;height: 100%; overflow: hidden;background-color:'+grand_total_color+';">' +(aggregates['total']=='0.00'?'':aggregates['total'])+'</div>';
+            return '<div style="position: relative; margin: 0px;padding: 5px;width: 100%;height: 100%; overflow: hidden;background-color:'+grand_total_color+';">' +(aggregates['total']=='0.00'?'':number_format(aggregates['total'],2))+'</div>';
         };
 
         var dataAdapter = new $.jqx.dataAdapter(source);
@@ -156,7 +156,7 @@ if(sizeof($action_buttons)>0)
                 rowsheight: 40,
                 columns: [
                     {
-                        text: '<?php echo $CI->lang->line('LABEL_SL_NO'); ?>',datafield: 'sl_no',pinned:true,width:'30', columntype: 'number',cellsalign: 'right', sortable: false, menu: false,
+                        text: '<?php echo $CI->lang->line('LABEL_SL_NO'); ?>',datafield: 'sl_no',width:'30', columntype: 'number',cellsalign: 'right', sortable: false, menu: false,
                         cellsrenderer: function(row, column, value, defaultHtml, columnSettings, record)
                         {
                             var element = $(defaultHtml);
