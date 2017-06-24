@@ -288,8 +288,8 @@ class Reports_stock_min_max extends Root_Controller
                 {
                     if($report_unit=='weight')
                     {
-                        $info['stock_min']=$min_max_stocks[$variety_id][$pack_size_id]['quantity_min']*1000/$info['pack_size'];
-                        $info['stock_max']=$min_max_stocks[$variety_id][$pack_size_id]['quantity_max']*1000/$info['pack_size'];
+                        $info['stock_min']=$min_max_stocks[$variety_id][$pack_size_id]['quantity_min']*$info['pack_size'];
+                        $info['stock_max']=$min_max_stocks[$variety_id][$pack_size_id]['quantity_max']*$info['pack_size'];
                     }
                     else
                     {

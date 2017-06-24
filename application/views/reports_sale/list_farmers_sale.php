@@ -40,7 +40,9 @@ if(sizeof($action_buttons)>0)
 
         ?>
         <div class="col-xs-12" style="margin-bottom: 20px;">
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="sl_no"><?php echo $CI->lang->line('LABEL_SL_NO');?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="farmer_name"><?php echo $CI->lang->line('LABEL_CUSTOMER_NAME');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="mobile_no"><?php echo $CI->lang->line('LABEL_MOBILE_NO');?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_payable"><?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE');?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_cancel"><?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE');?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_actual">Actual amount</label>
@@ -68,9 +70,10 @@ if(sizeof($action_buttons)>0)
             dataFields: [
                 { name: 'id', type: 'int' },
                 { name: 'farmer_name', type: 'string' },
-                { name: 'amount_payable', type: 'string' },
-                { name: 'amount_cancel', type: 'string' },
-                { name: 'amount_actual', type: 'string' }
+                { name: 'mobile_no', type: 'string' },
+                { name: 'amount_payable', type: 'number' },
+                { name: 'amount_cancel', type: 'number' },
+                { name: 'amount_actual', type: 'number' }
             ],
             url: url,
             type: 'POST',
@@ -105,6 +108,17 @@ if(sizeof($action_buttons)>0)
                     element.html('');
                 }
             }
+            if((column=='amount_payable')||(column=='amount_cancel')||(column=='amount_actual'))
+            {
+                if(value==0)
+                {
+                    element.html('');
+                }
+                else
+                {
+                    element.html(number_format(value,2));
+                }
+            }
             return element[0].outerHTML;
 
         };
@@ -115,17 +129,14 @@ if(sizeof($action_buttons)>0)
         {
             if(record.farmer_name=="Grand Total")
             {
-                //console.log(element);
                 return record[element];
-
             }
             return total;
             //return grand_starting_stock;
         };
         var aggregatesrenderer=function (aggregates)
         {
-            return '<div style="position: relative; margin: 0px;padding: 5px;width: 100%;height: 100%; overflow: hidden;background-color:'+grand_total_color+';">' +aggregates['total']+'</div>';
-
+            return '<div style="position: relative; margin: 0px;padding: 5px;width: 100%;height: 100%; overflow: hidden;background-color:'+grand_total_color+';">' +(aggregates['total']=='0.00'?'':aggregates['total'])+'</div>';
         };
 
         var dataAdapter = new $.jqx.dataAdapter(source);
@@ -135,6 +146,7 @@ if(sizeof($action_buttons)>0)
                 width: '100%',
                 height:'350px',
                 source: dataAdapter,
+                sortable: true,
                 columnsresize: true,
                 columnsreorder: true,
                 altrows: true,
@@ -143,7 +155,17 @@ if(sizeof($action_buttons)>0)
                 showstatusbar: true,
                 rowsheight: 40,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_CUSTOMER_NAME'); ?>', dataField: 'farmer_name',width:'200',cellsrenderer: cellsrenderer},
+                    {
+                        text: '<?php echo $CI->lang->line('LABEL_SL_NO'); ?>',datafield: 'sl_no',pinned:true,width:'30', columntype: 'number',cellsalign: 'right', sortable: false, menu: false,
+                        cellsrenderer: function(row, column, value, defaultHtml, columnSettings, record)
+                        {
+                            var element = $(defaultHtml);
+                            element.html(value);
+                            return element[0].outerHTML;
+                        }
+                    },
+                    { text: '<?php echo $CI->lang->line('LABEL_CUSTOMER_NAME'); ?>', dataField: 'farmer_name',width:'200',cellsrenderer: cellsrenderer, sortable: false, menu: false },
+                    { text: '<?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?>', dataField: 'mobile_no',width:'200',cellsrenderer: cellsrenderer, sortable: false, menu: false },
                     { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE'); ?>', dataField: 'amount_payable',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Sales Cancel', dataField: 'amount_cancel',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer},
                     { text: 'Actual amount', dataField: 'amount_actual',width:'100',cellsAlign:'right',cellsrenderer: cellsrenderer,aggregates: [{ 'total':aggregates}],aggregatesrenderer:aggregatesrenderer}

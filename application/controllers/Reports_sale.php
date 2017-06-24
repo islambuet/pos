@@ -724,13 +724,14 @@ class Reports_sale extends Root_Controller
         $grand_total=array();
         $grand_total['farmer_id']=0;
         $grand_total['farmer_name']='Grand Total';
+        $grand_total['mobile_no']='';
         $grand_total['amount_payable']=0;
         $grand_total['amount_cancel']=0;
         if(sizeof($farmer_ids)>0)
         {
             //farmer info
             $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f','f.id = sale.farmer_id','INNER');
-            $this->db->select('f.id,f.name farmer_name');
+            $this->db->select('f.id,f.name farmer_name,f.mobile_no');
             $this->db->where_in('f.id',$farmer_ids);
             $this->db->order_by('f.ordering DESC');
             $this->db->order_by('f.id ASC');
@@ -741,6 +742,7 @@ class Reports_sale extends Root_Controller
             {
                 $info=$sale_info[$result['id']];
                 $info['farmer_name']=$result['farmer_name'];
+                $info['mobile_no']=$result['mobile_no'];
                 $grand_total['amount_payable']+=$info['amount_payable'];
                 $grand_total['amount_cancel']+=$info['amount_cancel'];
                 $items[]=$this->get_farmer_sale_row($info);
@@ -755,31 +757,10 @@ class Reports_sale extends Root_Controller
         $row=array();
         $row['id']=$info['farmer_id'];
         $row['farmer_name']=$info['farmer_name'];
-
-        if($info['amount_payable']>0)
-        {
-            $row['amount_payable']=number_format($info['amount_payable'],2);
-        }
-        else
-        {
-            $row['amount_payable']='';
-        }
-        if($info['amount_cancel']>0)
-        {
-            $row['amount_cancel']=number_format($info['amount_cancel'],2);
-        }
-        else
-        {
-            $row['amount_cancel']='';
-        }
-        if(($info['amount_payable']-$info['amount_cancel'])!=0)
-        {
-            $row['amount_actual']=number_format(($info['amount_payable']-$info['amount_cancel']),2);
-        }
-        else
-        {
-            $row['amount_actual']='';
-        }
+        $row['mobile_no']=$info['mobile_no'];
+        $row['amount_payable']=$info['amount_payable'];
+        $row['amount_cancel']=$info['amount_cancel'];
+        $row['amount_actual']=$info['amount_payable']-$info['amount_cancel'];
         return $row;
 
     }
