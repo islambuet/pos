@@ -75,6 +75,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="farmer_type"><?php echo $CI->lang->line('LABEL_TYPE');?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="total_outlet">#Outlet</label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="mobile_no"><?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="address"><?php echo $CI->lang->line('LABEL_ADDRESS'); ?></label>
             </div>
         </div>
     <?php
@@ -101,6 +102,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'name', type: 'string' },
                 { name: 'group_name', type: 'string' },
                 { name: 'total_outlet', type: 'string' },
+                { name: 'address', type: 'string' },
                 { name: 'mobile_no', type: 'string' }
             ],
             id: 'id',
@@ -130,7 +132,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'300'},
                     { text: '<?php echo $CI->lang->line('LABEL_TYPE'); ?>', dataField: 'farmer_type',filtertype: 'list'},
                     { text: '#Outlet', dataField: 'total_outlet',width:'50',filtertype: 'list'},
-                    { text: '<?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?>', dataField: 'mobile_no'}
+                    { text: '<?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?>', dataField: 'mobile_no',width:'150'},
+                    { text: '<?php echo $CI->lang->line('LABEL_ADDRESS'); ?>', dataField: 'address'}
                 ]
             });
     });
