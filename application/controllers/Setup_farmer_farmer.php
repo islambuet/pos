@@ -77,6 +77,21 @@ class Setup_farmer_farmer extends Root_Controller
     }
     private function system_get_items()
     {
+        $current_records = $this->input->post('total_records');
+        if(!$current_records)
+        {
+            $current_records=0;
+        }
+        $pagesize = $this->input->post('pagesize');
+        if(!$pagesize)
+        {
+            $pagesize=100;
+        }
+        else
+        {
+            $pagesize=$pagesize*2;
+        }
+
         $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f');
         $this->db->select('f.*');
         $this->db->select('ft.name farmer_type');
@@ -85,6 +100,7 @@ class Setup_farmer_farmer extends Root_Controller
         $this->db->join($this->config->item('table_pos_setup_farmer_outlet').' fo','fo.farmer_id = f.id and fo.revision =1','LEFT');
         $this->db->order_by('f.id DESC');
         $this->db->group_by('f.id');
+        $this->db->limit($pagesize,$current_records);
         $items=$this->db->get()->result_array();
         foreach($items as &$item)
         {
