@@ -702,6 +702,11 @@ class Sales_sale extends Root_Controller
             $data['status']=$this->config->item('system_status_inactive');
             $data['date_canceled']=$time;
             $data['user_canceled']=$user->user_id;
+            if($user->user_group==1)
+            {
+                $data['date_canceled']=$item_info['date_sale']+1;
+                $data['remarks']=$data['remarks'].'('.System_helper::display_date_time($time).')';
+            }
 
             $this->db->trans_start();  //DB Transaction Handle START
             Query_helper::update($this->config->item('table_pos_sale'),$data,array('id ='.$item_id));
