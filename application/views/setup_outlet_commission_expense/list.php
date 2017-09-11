@@ -75,6 +75,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_commission_total">Total <?php echo $CI->lang->line('LABEL_AMOUNT_COMMISSION');?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_payment_total">Total <?php echo $CI->lang->line('LABEL_AMOUNT_PAYMENT');?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_expense_total">Total <?php echo $CI->lang->line('LABEL_AMOUNT_EXPENSE');?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="amount_balance">Balance</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="remarks">Balance <?php echo $CI->lang->line('LABEL_REMARKS');?></label>
             </div>
         </div>
     <?php
@@ -104,7 +106,9 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'amount_actual_payable', type: 'string' },
                 { name: 'amount_commission_total', type: 'string' },
                 { name: 'amount_payment_total', type: 'string' },
-                { name: 'amount_expense_total', type: 'string' }
+                { name: 'amount_expense_total', type: 'string' },
+                { name: 'amount_balance', type: 'string' },
+                { name: 'remarks', type: 'string' }
             ],
             id: 'id',
             type: 'POST',
@@ -139,7 +143,9 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: 'Actual <?php echo $CI->lang->line('LABEL_AMOUNT_PAYABLE'); ?>', dataField: 'amount_actual_payable',width:'120',cellsAlign:'right'},
                     { text: 'Total <?php echo $CI->lang->line('LABEL_AMOUNT_COMMISSION'); ?>', dataField: 'amount_commission_total',width:'120',cellsAlign:'right'},
                     { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_PAYMENT'); ?>', dataField: 'amount_payment_total',width:'120',cellsAlign:'right'},
-                    { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_EXPENSE'); ?>', dataField: 'amount_expense_total',width:'120',cellsAlign:'right'}
+                    { text: '<?php echo $CI->lang->line('LABEL_AMOUNT_EXPENSE'); ?>', dataField: 'amount_expense_total',width:'120',cellsAlign:'right'},
+                    { text: 'Balance', dataField: 'amount_balance',width:'120',cellsAlign:'right'},
+                    { text: '<?php echo $CI->lang->line('LABEL_REMARKS'); ?>', dataField: 'remarks',cellsAlign:'right'}
 
                 ]
             });

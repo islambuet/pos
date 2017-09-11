@@ -101,6 +101,7 @@ class Setup_outlet_commission_expense extends Root_Controller
         foreach($items as &$item)
         {
             $item['month']=$this->lang->line('LABEL_MONTH_'.$item['month']);
+            $item['amount_balance']=number_format($item['amount_actual_payable']-$item['amount_commission_total']-$item['amount_payment_total']-$item['amount_expense_total'],2);
             $item['amount_actual_sale']=number_format($item['amount_actual_sale'],2);
             $item['amount_actual_discount']=number_format($item['amount_actual_discount'],2);
             $item['amount_actual_payable']=number_format($item['amount_actual_payable'],2);

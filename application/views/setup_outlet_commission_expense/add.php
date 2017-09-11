@@ -127,7 +127,7 @@ $CI=& get_instance();
                 <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_AMOUNT_PAYMENT');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="item[amount_payment_total]" class="form-control float_type_positive" value=""/>
+                <input type="text" name="item[amount_payment_total]" class="form-control float_type_all" value=""/>
             </div>
         </div>
         <?php
@@ -139,7 +139,7 @@ $CI=& get_instance();
                     <label class="control-label pull-right"><?php echo $row['name'];?><span style="color:#FF0000">*</span></label>
                 </div>
                 <div class="col-sm-4 col-xs-8">
-                    <input type="text" name="expense[<?php echo $row['id'];?>]" class="form-control float_type_positive" value=""/>
+                    <input type="text" name="expense[<?php echo $row['id'];?>]" class="form-control float_type_all" value=""/>
                 </div>
             </div>
             <?php
