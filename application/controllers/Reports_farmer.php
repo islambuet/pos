@@ -109,7 +109,7 @@ class Reports_farmer extends Root_Controller
         $farmer_type=$this->input->post('farmer_type');
         $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f');
         $this->db->select('f.*');
-        $this->db->select('ft.name farmer_type');
+        $this->db->select('ft.name farmer_type,ft.discount_non_coupon');
         $this->db->select('count(sale.id) total_invoice',true);
         $this->db->join($this->config->item('table_pos_setup_farmer_type').' ft','ft.id = f.type_id','INNER');
         $this->db->join($this->config->item('table_pos_setup_farmer_outlet').' fo','fo.farmer_id = f.id and fo.revision =1','LEFT');
@@ -123,6 +123,20 @@ class Reports_farmer extends Root_Controller
         $this->db->group_by('f.id');
 
         $items=$this->db->get()->result_array();
+        $time=time();
+        foreach($items as &$item)
+        {
+            $item['barcode']=System_helper::get_farmer_barcode($item['id']);
+            if(($item['discount_non_coupon']>0)&&($item['time_card_off_end']<$time))
+            {
+                $item['status_card']=$this->config->item('system_status_yes');
+            }
+            else
+            {
+                $item['status_card']=$this->config->item('system_status_no');
+            }
+
+        }
         $this->json_return($items);
 
     }

@@ -94,7 +94,7 @@ class Setup_farmer_farmer extends Root_Controller
 
         $this->db->from($this->config->item('table_pos_setup_farmer_farmer').' f');
         $this->db->select('f.*');
-        $this->db->select('ft.name farmer_type');
+        $this->db->select('ft.name farmer_type,ft.discount_non_coupon');
         $this->db->select('count(customer_id) total_outlet',true);
         $this->db->join($this->config->item('table_pos_setup_farmer_type').' ft','ft.id = f.type_id','INNER');
         $this->db->join($this->config->item('table_pos_setup_farmer_outlet').' fo','fo.farmer_id = f.id and fo.revision =1','LEFT');
@@ -102,9 +102,19 @@ class Setup_farmer_farmer extends Root_Controller
         $this->db->group_by('f.id');
         $this->db->limit($pagesize,$current_records);
         $items=$this->db->get()->result_array();
+        $time=time();
         foreach($items as &$item)
         {
             $item['barcode']=System_helper::get_farmer_barcode($item['id']);
+            if(($item['discount_non_coupon']>0)&&($item['time_card_off_end']<$time))
+            {
+                $item['status_card']=$this->config->item('system_status_yes');
+            }
+            else
+            {
+                $item['status_card']=$this->config->item('system_status_no');
+            }
+
         }
         $this->json_return($items);
     }
@@ -259,6 +269,7 @@ class Setup_farmer_farmer extends Root_Controller
     {
         $id = $this->input->post("id");
         $user = User_helper::get_user();
+        $time=time();
         if($id>0)
         {
             if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)))
@@ -288,12 +299,17 @@ class Setup_farmer_farmer extends Root_Controller
         }
         else
         {
+            $duration_card_off=$this->input->post('duration_card_off');
             $data=$this->input->post('item');
+            if($duration_card_off>0)
+            {
+                $data['time_card_off_end']=$time+$duration_card_off*60;
+            }
             $this->db->trans_start();  //DB Transaction Handle START
             if($id>0)
             {
                 $data['user_updated'] = $user->user_id;
-                $data['date_updated'] = time();
+                $data['date_updated'] = $time;
 
                 Query_helper::update($this->config->item('table_pos_setup_farmer_farmer'),$data,array("id = ".$id));
 
@@ -302,7 +318,7 @@ class Setup_farmer_farmer extends Root_Controller
             {
 
                 $data['user_created'] = $user->user_id;
-                $data['date_created'] = time();
+                $data['date_created'] = $time;
                 Query_helper::add($this->config->item('table_pos_setup_farmer_farmer'),$data);
             }
             $this->db->trans_complete();   //DB Transaction Handle END

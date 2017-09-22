@@ -198,9 +198,10 @@ class Sales_sale extends Root_Controller
         $farmer_info=System_helper::get_farmer_from_barcode($code);
         if(sizeof($farmer_info)>0)
         {
-            //TODO commented dealer card restriction
-            /*$farmer_type_info=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('id ='.$farmer_info['type_id']),1);
-            if($farmer_type_info['discount_non_coupon']>0)
+
+            $farmer_type_info=Query_helper::get_info($this->config->item('table_pos_setup_farmer_type'),'*',array('id ='.$farmer_info['type_id']),1);
+            $time=time();
+            if(($farmer_type_info['discount_non_coupon']>0)&&($farmer_info['time_card_off_end']<$time))
             {
                 if($code!=System_helper::get_farmer_barcode($farmer_info['id']))
                 {
@@ -208,7 +209,7 @@ class Sales_sale extends Root_Controller
                     $ajax['system_message']='Scan Dealers Card';
                     $this->json_return($ajax);
                 }
-            }*/
+            }
             $this->system_load_sale_from($farmer_info['id'],$customer_id);
         }
         else

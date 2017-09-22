@@ -37,11 +37,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         ?>
         <div class="col-xs-12" style="margin-bottom: 20px;">
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="sl_no"><?php echo $CI->lang->line('LABEL_SL_NO');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="barcode"><?php echo $CI->lang->line('LABEL_BARCODE'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="name"><?php echo $CI->lang->line('LABEL_NAME'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="mobile_no"><?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?></label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="farmer_type"><?php echo $CI->lang->line('LABEL_TYPE');?></label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="status_card">Card Required?</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="address"><?php echo $CI->lang->line('LABEL_ADDRESS');?></label>
-            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="total_outlet">#Invoice</label>
+            <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="total_invoice">#Invoice</label>
             <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button"><?php echo $CI->lang->line('ACTION_DETAILS');?></label>
         </div>
     <?php
@@ -63,9 +65,11 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             dataType: "json",
             dataFields: [
                 { name: 'id', type: 'int' },
+                { name: 'barcode', type: 'string' },
                 { name: 'name', type: 'string' },
                 { name: 'mobile_no', type: 'string' },
                 { name: 'farmer_type', type: 'string' },
+                { name: 'status_card', type: 'string' },
                 { name: 'address', type: 'string' },
                 { name: 'total_invoice', type: 'string'}
             ],
@@ -114,9 +118,11 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                             return element[0].outerHTML;
                         }
                     },
+                    { text: '<?php echo $CI->lang->line('LABEL_BARCODE'); ?>', dataField: 'barcode',width:'100',cellsAlign:'right'},
                     { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'300'},
                     { text: '<?php echo $CI->lang->line('LABEL_MOBILE_NO'); ?>', dataField: 'mobile_no',width:'110'},
                     { text: '<?php echo $CI->lang->line('LABEL_TYPE'); ?>', dataField: 'farmer_type',filtertype: 'list',width:'110'},
+                    { text: 'Card Required?', dataField: 'status_card',width:'100',filtertype: 'list'},
                     { text: '<?php echo $CI->lang->line('LABEL_ADDRESS'); ?>', dataField: 'address'},
                     { text: '#Invoice', dataField: 'total_invoice',width:'50',cellsAlign:'right',filtertype: 'list'},
                     { text: '<?php echo $CI->lang->line('ACTION_DETAILS'); ?>',dataField: 'details_button',width:'150',cellsrenderer:cellsrenderer}
