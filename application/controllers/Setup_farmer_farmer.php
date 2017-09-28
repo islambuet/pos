@@ -303,7 +303,7 @@ class Setup_farmer_farmer extends Root_Controller
             $data=$this->input->post('item');
             if($duration_card_off>0)
             {
-                $data['time_card_off_end']=$time+$duration_card_off*60;
+                $data['time_card_off_end']=$time+$duration_card_off*60*60;
             }
             $this->db->trans_start();  //DB Transaction Handle START
             if($id>0)
