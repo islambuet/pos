@@ -84,7 +84,21 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             if(column=='details_button')
             {
                 element.css({'margin': '0px','width': '100%', 'height': '100%',padding:'5px','line-height':'25px'});
-                element.html('<div><button class="btn btn-primary pop_up" data-action-link="<?php echo site_url($CI->controller_url.'/index/details_farmer'); ?>/'+record.id+'">View Bardcode</button></div>');
+                <?php
+                if(isset($CI->permissions['action3']) && ($CI->permissions['action3']==1))
+                {
+                    ?>
+                    element.html('<div><button class="btn btn-primary pop_up" data-action-link="<?php echo site_url($CI->controller_url.'/index/details_farmer'); ?>/'+record.id+'">View Bardcode</button></div>');
+                    <?php
+                }
+                else
+                {
+                    ?>
+                    element.html('<div></div>');
+                    <?php
+                }
+                ?>
+
             }
             return element[0].outerHTML;
 
