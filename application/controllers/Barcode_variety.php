@@ -167,6 +167,7 @@ class Barcode_variety extends Root_Controller
             $data['item']=$this->db->get()->row_array();
             $data['item']['line1']=$item['line1'];
             $data['item']['outlet']=$item['outlet'];
+            $data['item']['show_expire']=$item['show_expire'];
             $data['item']['bar_code']=System_helper::get_variety_barcode($data['item']['crop_id'],$data['item']['variety_id'],$data['item']['pack_id']);
             $result=Query_helper::get_info($this->config->item('table_pos_setup_exp_date'),'date_expire',array(),1,0,array('id desc'));
             //$data['item']['date_expire']=System_helper::display_date($result['date_expire']);

@@ -121,6 +121,17 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 </select>
             </div>
         </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Show Expire date<span style="color:#FF0000">*</span></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <select name="item[show_expire]" class="form-control">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+        </div>
 
     </div>
 
